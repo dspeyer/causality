@@ -45,7 +45,7 @@ for line in meta:
     except:
         print 'ERROR: '+line
 
-o=file('table.csv','w')
+o=file('absolute.csv','w')
 o.write('species')
 for srr in srrs:
     o.write(','+srr)
@@ -56,4 +56,17 @@ for spe in spes:
     o.write('\n'+spe)
     for srr in srrs:
         o.write(','+str(cnt[spe][srr]))
+o.close()
+
+o=file('relative.csv','w')
+o.write('species')
+for srr in srrs:
+    o.write(','+srr)
+o.write('\nsick')
+for srr in srrs:
+    o.write(','+sick[srr])
+for spe in spes:
+    o.write('\n'+spe)
+    for srr in srrs:
+        o.write(','+str(float(cnt[spe][srr])/tots[srr]))
 o.close()
