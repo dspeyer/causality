@@ -86,6 +86,13 @@ def normmibact(a,b,shuffle=False):
         random.shuffle(bl)
     return normmi(al,bl)
 
+def normmicond(a,b,c):
+    eac=entropy(map(lambda x:'%s/%s'%x,zip(a,c)))
+    ebc=entropy(map(lambda x:'%s/%s'%x,zip(b,c)))
+    ec=entropy(c)
+    ej=entropy(map(lambda x:'%s/%s/%s'%x,zip(a,b,c)))
+    return (eac+ebc-ej-ec)/max(eac,ebc)
+
 gcnt={}
 for spe in spes:
     l=d2l(cnt[spe],srrs)
@@ -119,7 +126,25 @@ nulldist.sort()
 
 thresh=nulldist[990]
 
-print "Using threshold %f"%thresh
+nullcdist=[]
+for i in range(1000):
+    ri1=int(random.random()*len(gspes))
+    ri2=int(random.random()*len(gspes))
+    ri3=int(random.random()*len(gspes))
+    l1=copy.copy(gcnt[gspes[ri1]])
+    l2=copy.copy(gcnt[gspes[ri2]])
+    l3=copy.copy(gcnt[gspes[ri3]])
+    random.shuffle(l1)
+    random.shuffle(l2)
+    random.shuffle(l3)
+    nullcdist.append(normmicond(l1,l2,l3))
+
+nullcdist.sort()
+
+condthresh=nullcdist[990]
+
+
+print "Using threshold %f and conditional threshold of %f"%(thresh,condthresh)
 
 trios=[]
 for i in range(len(gspes)):
@@ -138,12 +163,6 @@ for i in range(len(gspes)):
                  mis[si]['sick']>thresh and mis[sj]['sick']>thresh and mis[sk]['sick']>thresh):
                 trios.append([si,sj,sk])
 
-def normmicond(a,b,c):
-    eac=entropy(map(lambda x:'%s/%s'%x,zip(a,c)))
-    ebc=entropy(map(lambda x:'%s/%s'%x,zip(b,c)))
-    ec=entropy(c)
-    ej=entropy(map(lambda x:'%s/%s/%s'%x,zip(a,b,c)))
-    return (eac+ebc-ej-ec)/max(eac,ebc)
 
 for trio in trios:
     if normmicond(gcnt[trio[0]],gcnt[trio[1]],gcnt[trio[2]])<thresh:
@@ -158,10 +177,10 @@ for trio in trios:
     mic0b2=normmicond(gcnt[trio[2]],gcnt['sick'],gcnt[trio[0]])
     mic1b2=normmicond(gcnt[trio[2]],gcnt['sick'],gcnt[trio[1]])
     mic2b0=normmicond(gcnt[trio[0]],gcnt['sick'],gcnt[trio[2]])
-    if mic0b1<thresh and mic0b2<thresh and mic1b0>thresh and mic2b0>thresh:
+    if mic0b1<condthresh and mic0b2<condthresh and mic1b0>condthresh and mic2b0>condthresh:
         print "%s cuts %s and %s" % (trio[0],trio[1],trio[2])
-    if mic1b2<thresh and mic1b0<thresh and mic0b1>thresh and mic2b1>thresh:
+    if mic1b2<condthresh and mic1b0<condthresh and mic0b1>condthresh and mic2b1>condthresh:
         print "%s cuts %s and %s" % (trio[1],trio[2],trio[0])
-    if mic2b1<thresh and mic2b0<thresh and mic0b2>thresh and mic1b2>thresh:
+    if mic2b1<condthresh and mic2b0<condthresh and mic0b2>condthresh and mic1b2>condthresh:
         print "%s cuts %s and %s" % (trio[2],trio[1],trio[0])
 
