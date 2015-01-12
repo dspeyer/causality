@@ -113,7 +113,7 @@ for i in range(len(gspes)):
         mis[sj][si]=mis[si][sj]
 
 nulldist=[]
-for i in range(1000):
+for i in range(10000):
     ri1=int(random.random()*len(gspes))
     ri2=int(random.random()*len(gspes))
     l1=copy.copy(gcnt[gspes[ri1]])
@@ -124,10 +124,10 @@ for i in range(1000):
 
 nulldist.sort()
 
-thresh=nulldist[990]
+thresh=nulldist[9900]
 
 nullcdist=[]
-for i in range(1000):
+for i in range(10000):
     ri1=int(random.random()*len(gspes))
     ri2=int(random.random()*len(gspes))
     ri3=int(random.random()*len(gspes))
@@ -141,8 +141,22 @@ for i in range(1000):
 
 nullcdist.sort()
 
-condthresh=nullcdist[990]
+condthresh=nullcdist[9900]
 
+def findp(v,l):
+    mi=0
+    ma=len(l)-1
+    while ma>mi+1:
+        t=int((mi+ma)/2)
+        if v>l[t]:
+            mi=t
+        else:
+            ma=t
+    return (len(l)-float(ma))/len(l) # subtracting before dividing avoids annoying rounding errors
+
+#thresh=.116535
+#thresh=.1
+#condthresh=.067942
 
 print "Using threshold %f and conditional threshold of %f"%(thresh,condthresh)
 
@@ -163,13 +177,47 @@ for i in range(len(gspes)):
                  mis[si]['sick']>thresh and mis[sj]['sick']>thresh and mis[sk]['sick']>thresh):
                 trios.append([si,sj,sk])
 
+print "We have %d trios"%len(trios)
+
+def abbr(name):
+    [g,s]=name.split(' ')
+    return g[0]+'.'+s[0:5]
+
+def printres(a,h1,h2,micabh1,micabh2,mich1ba,mich2ba,acut,h1cut,h2cut):
+    aab=abbr(a)
+    h1ab=abbr(h1)
+    h2ab=abbr(h2)
+    print "Evidence that %s(%s) causes Crohn's disease:" % (a,aab)
+    print "  Helper bacteria: %s(%s) and %s(%s)" % (h1,h1ab,h2,h2ab)
+    print "  Evidence that there's some link:"
+    print "    NMI(%s,%s) = %f   p<%.4f" % (aab,h1ab,mis[a][h1],findp(mis[a][h1],nulldist))
+    print "    NMI(%s,%s) = %f   p<%.4f" % (aab,h2ab,mis[a][h2],findp(mis[a][h2],nulldist))
+    print "    NMI(%s,%s) = %f   p<%.4f" % (h1ab,h2ab,mis[h1][h2],findp(mis[h1][h2],nulldist))
+    print "    NMI(%s,Crohn's) = %f   p<%.4f" % (aab,mis[a]['sick'],findp(mis[a]['sick'],nulldist))
+    print "    NMI(%s,Crohn's) = %f   p<%.4f" % (h1ab,mis[h1]['sick'],findp(mis[h1]['sick'],nulldist))
+    print "    NMI(%s,Crohn's) = %f   p<%.4f" % (h2ab,mis[h2]['sick'],findp(mis[h2]['sick'],nulldist))
+    print "  Evidence that some common factor causes all three bacteria:"
+    print "    NMI(%s,%s|%s) = %f   p<%.4f" % (aab,h1ab,h2ab,h2cut,findp(h2cut,nullcdist))
+    print "    NMI(%s,%s|%s) = %f   p<%.4f" % (aab,h2ab,h1ab,h1cut,findp(h1cut,nullcdist))
+    print "    NMI(%s,%s|%s) = %f   p<%.4f" % (h1ab,h2ab,aab,acut,findp(acut,nullcdist))
+    print "  Evidence that %s screens the other bacteria from Crohn's disease:" % a
+    print "    NMI(%s,Crohn's|%s) = %f   p>%.4f" % (h1ab,aab,micabh1,findp(micabh1,nullcdist))
+    print "    NMI(%s,Crohn's|%s) = %f   p>%.4f" % (h2ab,aab,micabh2,findp(micabh2,nullcdist))
+    print "  Sanity check, the other bacteria do not screen %s from Crohn's disease:" % a
+    print "    NMI(%s,Crohn's|%s) = %f   p<%.4f" % (aab,h1ab,mich1ba,findp(mich1ba,nullcdist))
+    print "    NMI(%s,Crohn's|%s) = %f   p<%.4f" % (aab,h2ab,mich2ba,findp(mich2ba,nullcdist))
+    print ""
+
 
 for trio in trios:
-    if normmicond(gcnt[trio[0]],gcnt[trio[1]],gcnt[trio[2]])<thresh:
+    mic012=normmicond(gcnt[trio[0]],gcnt[trio[1]],gcnt[trio[2]])
+    if mic012<condthresh:
         continue
-    if normmicond(gcnt[trio[0]],gcnt[trio[2]],gcnt[trio[1]])<thresh:
+    mic201=normmicond(gcnt[trio[2]],gcnt[trio[0]],gcnt[trio[1]])
+    if mic201<condthresh:
         continue
-    if normmicond(gcnt[trio[1]],gcnt[trio[2]],gcnt[trio[0]])<thresh:
+    mic120=normmicond(gcnt[trio[1]],gcnt[trio[2]],gcnt[trio[0]])
+    if mic120<condthresh:
         continue
     mic0b1=normmicond(gcnt[trio[1]],gcnt['sick'],gcnt[trio[0]])
     mic1b0=normmicond(gcnt[trio[0]],gcnt['sick'],gcnt[trio[1]])
@@ -178,9 +226,18 @@ for trio in trios:
     mic1b2=normmicond(gcnt[trio[2]],gcnt['sick'],gcnt[trio[1]])
     mic2b0=normmicond(gcnt[trio[0]],gcnt['sick'],gcnt[trio[2]])
     if mic0b1<condthresh and mic0b2<condthresh and mic1b0>condthresh and mic2b0>condthresh:
-        print "%s cuts %s and %s" % (trio[0],trio[1],trio[2])
+        printres(trio[0],trio[1],trio[2],mic0b1,mic0b2,mic1b0,mic2b0,mic120,mic201,mic012)
     if mic1b2<condthresh and mic1b0<condthresh and mic0b1>condthresh and mic2b1>condthresh:
-        print "%s cuts %s and %s" % (trio[1],trio[2],trio[0])
+        printres(trio[1],trio[0],trio[2],mic1b0,mic0b2,mic0b1,mic2b1,mic201,mic120,mic012)
     if mic2b1<condthresh and mic2b0<condthresh and mic0b2>condthresh and mic1b2>condthresh:
-        print "%s cuts %s and %s" % (trio[2],trio[1],trio[0])
+        printres(trio[2],trio[0],trio[1],mic2b0,mic2b1,mic0b2,mic1b2,mic012,mic120,mic201)
+
+
+
+
+
+        print "%s(%.2f) cuts(%.2f,%.2f) %s(%.2f) and %s(%.2f) (%.2f,%.2f,%.2f)" % (trio[2],mis[trio[2]]['sick'],mic2b1,mic2b0,trio[0],mis[trio[0]]['sick'],trio[1],mis[trio[1]]['sick'],mis[trio[0]][trio[1]],mis[trio[0]][trio[2]],mis[trio[2]][trio[1]])
+        print " (noncuts: %.2f,%.2f)"%(mic0b2,mic1b2)
+        #        print "%s cuts %s and %s" % (trio[2],trio[1],trio[0])
+
 
