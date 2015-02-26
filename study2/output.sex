@@ -1,0 +1,19 @@
+Evidence that Ralstonia solanacearum(R.solan) causes the patient's sex:
+  Helper bacteria: Clostridium fimetarium(C.fimet) and Flectobacillus major(F.major)
+  Evidence that there's some link:
+    NMI(R.solan,C.fimet) = 0.094326   p<0.0026
+    NMI(R.solan,F.major) = 0.089663   p<0.0035
+    NMI(C.fimet,F.major) = 0.155526   p<0.0001
+    NMI(R.solan,is_male) = 0.139788   p<0.0001
+    NMI(C.fimet,is_male) = 0.079437   p<0.0071
+    NMI(F.major,is_male) = 0.080665   p<0.0064
+  Evidence that some common factor causes all three bacteria:
+    NMI(R.solan,C.fimet|F.major) = 0.083792   p<0.0019
+    NMI(R.solan,F.major|C.fimet) = 0.090353   p<0.0006
+    NMI(C.fimet,F.major|R.solan) = 0.099099   p<0.0002
+  Evidence that Ralstonia solanacearum screens the other bacteria from being male:
+    NMI(C.fimet,is_male|R.solan) = 0.035952   p>0.2973
+    NMI(F.major,is_male|R.solan) = 0.044280   p>0.1538
+  Sanity check, the other bacteria do not screen Ralstonia solanacearum from bing male:
+    NMI(R.solan,is_male|C.fimet) = 0.083597   p<0.0020
+    NMI(R.solan,is_male|F.major) = 0.083766   p<0.0019

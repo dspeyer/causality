@@ -1,0 +1,620 @@
+Evidence that Phascolarctobacterium faecium(P.faeci) causes Crohn's disease:
+  Helper bacteria: Coprococcus catus(C.catus) and Catabacter hongkongensis(C.hongk)
+  Evidence that there's some link:
+    NMI(P.faeci,C.catus) = 0.127183   p<0.0002
+    NMI(P.faeci,C.hongk) = 0.095504   p<0.0029
+    NMI(C.catus,C.hongk) = 0.123120   p<0.0004
+    NMI(P.faeci,Crohn's) = 0.120578   p<0.0004
+    NMI(C.catus,Crohn's) = 0.082648   p<0.0075
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+  Evidence that some common factor causes all three bacteria:
+    NMI(P.faeci,C.catus|C.hongk) = 0.110172   p<0.0001
+    NMI(P.faeci,C.hongk|C.catus) = 0.076041   p<0.0041
+    NMI(C.catus,C.hongk|P.faeci) = 0.078601   p<0.0027
+  Evidence that Phascolarctobacterium faecium screens the other bacteria from Crohn's disease:
+    NMI(C.catus,Crohn's|P.faeci) = 0.044223   p>0.1478
+    NMI(C.hongk,Crohn's|P.faeci) = 0.045074   p>0.1367
+  Sanity check, the other bacteria do not screen Phascolarctobacterium faecium from Crohn's disease:
+    NMI(P.faeci,Crohn's|C.catus) = 0.076046   p<0.0041
+    NMI(P.faeci,Crohn's|C.hongk) = 0.072322   p<0.0068
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Coprococcus catus(C.catus) and Pseudobutyrivibrio ruminis(P.rumin)
+  Evidence that there's some link:
+    NMI(D.thios,C.catus) = 0.078922   p<0.0099
+    NMI(D.thios,P.rumin) = 0.139245   p<0.0001
+    NMI(C.catus,P.rumin) = 0.096531   p<0.0028
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(C.catus,Crohn's) = 0.082648   p<0.0075
+    NMI(P.rumin,Crohn's) = 0.091377   p<0.0042
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,C.catus|P.rumin) = 0.074381   p<0.0051
+    NMI(D.thios,P.rumin|C.catus) = 0.071844   p<0.0077
+    NMI(C.catus,P.rumin|D.thios) = 0.087028   p<0.0005
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(C.catus,Crohn's|D.thios) = 0.037072   p>0.2622
+    NMI(P.rumin,Crohn's|D.thios) = 0.045380   p>0.1330
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|C.catus) = 0.085356   p<0.0005
+    NMI(D.thios,Crohn's|P.rumin) = 0.142845   p<0.0001
+
+Evidence that Corynebacterium kroppenstedtii(C.kropp) causes Crohn's disease:
+  Helper bacteria: Victivallis vadensis(V.vaden) and Gracilibacter thermotolerans(G.therm)
+  Evidence that there's some link:
+    NMI(C.kropp,V.vaden) = 0.098917   p<0.0027
+    NMI(C.kropp,G.therm) = 0.078919   p<0.0099
+    NMI(V.vaden,G.therm) = 0.183760   p<0.0001
+    NMI(C.kropp,Crohn's) = 0.147460   p<0.0001
+    NMI(V.vaden,Crohn's) = 0.095117   p<0.0030
+    NMI(G.therm,Crohn's) = 0.092955   p<0.0035
+  Evidence that some common factor causes all three bacteria:
+    NMI(C.kropp,V.vaden|G.therm) = 0.090189   p<0.0005
+    NMI(C.kropp,G.therm|V.vaden) = 0.083358   p<0.0012
+    NMI(V.vaden,G.therm|C.kropp) = 0.130668   p<0.0001
+  Evidence that Corynebacterium kroppenstedtii screens the other bacteria from Crohn's disease:
+    NMI(V.vaden,Crohn's|C.kropp) = 0.041637   p>0.1824
+    NMI(G.therm,Crohn's|C.kropp) = 0.061337   p>0.0289
+  Sanity check, the other bacteria do not screen Corynebacterium kroppenstedtii from Crohn's disease:
+    NMI(C.kropp,Crohn's|V.vaden) = 0.072887   p<0.0063
+    NMI(C.kropp,Crohn's|G.therm) = 0.095960   p<0.0002
+
+Evidence that Butyricimonas virosa(B.viros) causes Crohn's disease:
+  Helper bacteria: Victivallis vadensis(V.vaden) and Gracilibacter thermotolerans(G.therm)
+  Evidence that there's some link:
+    NMI(B.viros,V.vaden) = 0.147272   p<0.0001
+    NMI(B.viros,G.therm) = 0.168403   p<0.0001
+    NMI(V.vaden,G.therm) = 0.183760   p<0.0001
+    NMI(B.viros,Crohn's) = 0.187184   p<0.0001
+    NMI(V.vaden,Crohn's) = 0.095117   p<0.0030
+    NMI(G.therm,Crohn's) = 0.092955   p<0.0035
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.viros,V.vaden|G.therm) = 0.089187   p<0.0005
+    NMI(B.viros,G.therm|V.vaden) = 0.104224   p<0.0001
+    NMI(V.vaden,G.therm|B.viros) = 0.092286   p<0.0005
+  Evidence that Butyricimonas virosa screens the other bacteria from Crohn's disease:
+    NMI(V.vaden,Crohn's|B.viros) = 0.023733   p>0.6180
+    NMI(G.therm,Crohn's|B.viros) = 0.061337   p>0.0289
+  Sanity check, the other bacteria do not screen Butyricimonas virosa from Crohn's disease:
+    NMI(B.viros,Crohn's|V.vaden) = 0.089235   p<0.0005
+    NMI(B.viros,Crohn's|G.therm) = 0.101013   p<0.0001
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Victivallis vadensis(V.vaden) and Gracilibacter thermotolerans(G.therm)
+  Evidence that there's some link:
+    NMI(D.thios,V.vaden) = 0.134023   p<0.0001
+    NMI(D.thios,G.therm) = 0.127393   p<0.0002
+    NMI(V.vaden,G.therm) = 0.183760   p<0.0001
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(V.vaden,Crohn's) = 0.095117   p<0.0030
+    NMI(G.therm,Crohn's) = 0.092955   p<0.0035
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,V.vaden|G.therm) = 0.084823   p<0.0006
+    NMI(D.thios,G.therm|V.vaden) = 0.086816   p<0.0005
+    NMI(V.vaden,G.therm|D.thios) = 0.113983   p<0.0001
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(V.vaden,Crohn's|D.thios) = 0.028918   p>0.4582
+    NMI(G.therm,Crohn's|D.thios) = 0.033511   p>0.3367
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|V.vaden) = 0.130321   p<0.0001
+    NMI(D.thios,Crohn's|G.therm) = 0.132071   p<0.0001
+
+Evidence that Catabacter hongkongensis(C.hongk) causes Crohn's disease:
+  Helper bacteria: Acetivibrio cellulolyticus(A.cellu) and Acinetobacter haemolyticus(A.haemo)
+  Evidence that there's some link:
+    NMI(C.hongk,A.cellu) = 0.177507   p<0.0001
+    NMI(C.hongk,A.haemo) = 0.095633   p<0.0029
+    NMI(A.cellu,A.haemo) = 0.133628   p<0.0001
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+    NMI(A.cellu,Crohn's) = 0.089773   p<0.0049
+    NMI(A.haemo,Crohn's) = 0.115527   p<0.0007
+  Evidence that some common factor causes all three bacteria:
+    NMI(C.hongk,A.cellu|A.haemo) = 0.123821   p<0.0001
+    NMI(C.hongk,A.haemo|A.cellu) = 0.077113   p<0.0034
+    NMI(A.cellu,A.haemo|C.hongk) = 0.095688   p<0.0003
+  Evidence that Catabacter hongkongensis screens the other bacteria from Crohn's disease:
+    NMI(A.cellu,Crohn's|C.hongk) = 0.054018   p>0.0596
+    NMI(A.haemo,Crohn's|C.hongk) = 0.071168   p>0.0084
+  Sanity check, the other bacteria do not screen Catabacter hongkongensis from Crohn's disease:
+    NMI(C.hongk,Crohn's|A.cellu) = 0.088850   p<0.0005
+    NMI(C.hongk,Crohn's|A.haemo) = 0.071922   p<0.0075
+
+Evidence that Catabacter hongkongensis(C.hongk) causes Crohn's disease:
+  Helper bacteria: Acetivibrio cellulolyticus(A.cellu) and Alistipes indistinctus(A.indis)
+  Evidence that there's some link:
+    NMI(C.hongk,A.cellu) = 0.177507   p<0.0001
+    NMI(C.hongk,A.indis) = 0.126501   p<0.0002
+    NMI(A.cellu,A.indis) = 0.125282   p<0.0003
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+    NMI(A.cellu,Crohn's) = 0.089773   p<0.0049
+    NMI(A.indis,Crohn's) = 0.094501   p<0.0031
+  Evidence that some common factor causes all three bacteria:
+    NMI(C.hongk,A.cellu|A.indis) = 0.124759   p<0.0001
+    NMI(C.hongk,A.indis|A.cellu) = 0.092889   p<0.0005
+    NMI(A.cellu,A.indis|C.hongk) = 0.089681   p<0.0005
+  Evidence that Catabacter hongkongensis screens the other bacteria from Crohn's disease:
+    NMI(A.cellu,Crohn's|C.hongk) = 0.054018   p>0.0596
+    NMI(A.indis,Crohn's|C.hongk) = 0.046343   p>0.1237
+  Sanity check, the other bacteria do not screen Catabacter hongkongensis from Crohn's disease:
+    NMI(C.hongk,Crohn's|A.cellu) = 0.088850   p<0.0005
+    NMI(C.hongk,Crohn's|A.indis) = 0.108500   p<0.0001
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Acetivibrio cellulolyticus(A.cellu) and Catabacter hongkongensis(C.hongk)
+  Evidence that there's some link:
+    NMI(D.thios,A.cellu) = 0.140035   p<0.0001
+    NMI(D.thios,C.hongk) = 0.160339   p<0.0001
+    NMI(A.cellu,C.hongk) = 0.177507   p<0.0001
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(A.cellu,Crohn's) = 0.089773   p<0.0049
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,A.cellu|C.hongk) = 0.091887   p<0.0005
+    NMI(D.thios,C.hongk|A.cellu) = 0.106075   p<0.0001
+    NMI(A.cellu,C.hongk|D.thios) = 0.128665   p<0.0001
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(A.cellu,Crohn's|D.thios) = 0.061395   p>0.0284
+    NMI(C.hongk,Crohn's|D.thios) = 0.042766   p>0.1657
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|A.cellu) = 0.142292   p<0.0001
+    NMI(D.thios,Crohn's|C.hongk) = 0.089819   p<0.0005
+
+Evidence that Butyricimonas virosa(B.viros) causes Crohn's disease:
+  Helper bacteria: Acetivibrio cellulolyticus(A.cellu) and Eubacterium ruminantium(E.rumin)
+  Evidence that there's some link:
+    NMI(B.viros,A.cellu) = 0.087069   p<0.0059
+    NMI(B.viros,E.rumin) = 0.099391   p<0.0024
+    NMI(A.cellu,E.rumin) = 0.113346   p<0.0008
+    NMI(B.viros,Crohn's) = 0.187184   p<0.0001
+    NMI(A.cellu,Crohn's) = 0.089773   p<0.0049
+    NMI(E.rumin,Crohn's) = 0.151585   p<0.0001
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.viros,A.cellu|E.rumin) = 0.081157   p<0.0018
+    NMI(B.viros,E.rumin|A.cellu) = 0.080588   p<0.0020
+    NMI(A.cellu,E.rumin|B.viros) = 0.088542   p<0.0005
+  Evidence that Butyricimonas virosa screens the other bacteria from Crohn's disease:
+    NMI(A.cellu,Crohn's|B.viros) = 0.062919   p>0.0234
+    NMI(E.rumin,Crohn's|B.viros) = 0.079009   p>0.0026
+  Sanity check, the other bacteria do not screen Butyricimonas virosa from Crohn's disease:
+    NMI(B.viros,Crohn's|A.cellu) = 0.112999   p<0.0001
+    NMI(B.viros,Crohn's|E.rumin) = 0.082821   p<0.0014
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Acetivibrio cellulolyticus(A.cellu) and Acinetobacter haemolyticus(A.haemo)
+  Evidence that there's some link:
+    NMI(D.thios,A.cellu) = 0.140035   p<0.0001
+    NMI(D.thios,A.haemo) = 0.142959   p<0.0001
+    NMI(A.cellu,A.haemo) = 0.133628   p<0.0001
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(A.cellu,Crohn's) = 0.089773   p<0.0049
+    NMI(A.haemo,Crohn's) = 0.115527   p<0.0007
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,A.cellu|A.haemo) = 0.079918   p<0.0025
+    NMI(D.thios,A.haemo|A.cellu) = 0.073642   p<0.0057
+    NMI(A.cellu,A.haemo|D.thios) = 0.081508   p<0.0018
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(A.cellu,Crohn's|D.thios) = 0.061395   p>0.0284
+    NMI(A.haemo,Crohn's|D.thios) = 0.033137   p>0.3446
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|A.cellu) = 0.142292   p<0.0001
+    NMI(D.thios,Crohn's|A.haemo) = 0.113155   p<0.0001
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Acetivibrio cellulolyticus(A.cellu) and Alistipes indistinctus(A.indis)
+  Evidence that there's some link:
+    NMI(D.thios,A.cellu) = 0.140035   p<0.0001
+    NMI(D.thios,A.indis) = 0.133028   p<0.0001
+    NMI(A.cellu,A.indis) = 0.125282   p<0.0003
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(A.cellu,Crohn's) = 0.089773   p<0.0049
+    NMI(A.indis,Crohn's) = 0.094501   p<0.0031
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,A.cellu|A.indis) = 0.091144   p<0.0005
+    NMI(D.thios,A.indis|A.cellu) = 0.079520   p<0.0025
+    NMI(A.cellu,A.indis|D.thios) = 0.088690   p<0.0005
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(A.cellu,Crohn's|D.thios) = 0.061395   p>0.0284
+    NMI(A.indis,Crohn's|D.thios) = 0.043997   p>0.1504
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|A.cellu) = 0.142292   p<0.0001
+    NMI(D.thios,Crohn's|A.indis) = 0.134116   p<0.0001
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Acetivibrio cellulolyticus(A.cellu) and Eubacterium ruminantium(E.rumin)
+  Evidence that there's some link:
+    NMI(D.thios,A.cellu) = 0.140035   p<0.0001
+    NMI(D.thios,E.rumin) = 0.088532   p<0.0055
+    NMI(A.cellu,E.rumin) = 0.113346   p<0.0008
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(A.cellu,Crohn's) = 0.089773   p<0.0049
+    NMI(E.rumin,Crohn's) = 0.151585   p<0.0001
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,A.cellu|E.rumin) = 0.134910   p<0.0001
+    NMI(D.thios,E.rumin|A.cellu) = 0.098355   p<0.0001
+    NMI(A.cellu,E.rumin|D.thios) = 0.126271   p<0.0001
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(A.cellu,Crohn's|D.thios) = 0.061395   p>0.0284
+    NMI(E.rumin,Crohn's|D.thios) = 0.057925   p>0.0419
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|A.cellu) = 0.142292   p<0.0001
+    NMI(D.thios,Crohn's|E.rumin) = 0.126406   p<0.0001
+
+Evidence that Catabacter hongkongensis(C.hongk) causes Crohn's disease:
+  Helper bacteria: Corynebacterium kroppenstedtii(C.kropp) and Gracilibacter thermotolerans(G.therm)
+  Evidence that there's some link:
+    NMI(C.hongk,C.kropp) = 0.089683   p<0.0049
+    NMI(C.hongk,G.therm) = 0.118816   p<0.0005
+    NMI(C.kropp,G.therm) = 0.078919   p<0.0099
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+    NMI(C.kropp,Crohn's) = 0.147460   p<0.0001
+    NMI(G.therm,Crohn's) = 0.092955   p<0.0035
+  Evidence that some common factor causes all three bacteria:
+    NMI(C.hongk,C.kropp|G.therm) = 0.095298   p<0.0003
+    NMI(C.hongk,G.therm|C.kropp) = 0.108185   p<0.0001
+    NMI(C.kropp,G.therm|C.hongk) = 0.077629   p<0.0029
+  Evidence that Catabacter hongkongensis screens the other bacteria from Crohn's disease:
+    NMI(C.kropp,Crohn's|C.hongk) = 0.055388   p>0.0535
+    NMI(G.therm,Crohn's|C.hongk) = 0.066247   p>0.0156
+  Sanity check, the other bacteria do not screen Catabacter hongkongensis from Crohn's disease:
+    NMI(C.hongk,Crohn's|C.kropp) = 0.070427   p<0.0091
+    NMI(C.hongk,Crohn's|G.therm) = 0.080493   p<0.0022
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Corynebacterium kroppenstedtii(C.kropp) and Gracilibacter thermotolerans(G.therm)
+  Evidence that there's some link:
+    NMI(D.thios,C.kropp) = 0.100008   p<0.0023
+    NMI(D.thios,G.therm) = 0.127393   p<0.0002
+    NMI(C.kropp,G.therm) = 0.078919   p<0.0099
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(C.kropp,Crohn's) = 0.147460   p<0.0001
+    NMI(G.therm,Crohn's) = 0.092955   p<0.0035
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,C.kropp|G.therm) = 0.082935   p<0.0013
+    NMI(D.thios,G.therm|C.kropp) = 0.094203   p<0.0003
+    NMI(C.kropp,G.therm|D.thios) = 0.073612   p<0.0057
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(C.kropp,Crohn's|D.thios) = 0.044156   p>0.1487
+    NMI(G.therm,Crohn's|D.thios) = 0.033511   p>0.3367
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|C.kropp) = 0.114124   p<0.0001
+    NMI(D.thios,Crohn's|G.therm) = 0.132071   p<0.0001
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Catabacter hongkongensis(C.hongk) and Acinetobacter haemolyticus(A.haemo)
+  Evidence that there's some link:
+    NMI(D.thios,C.hongk) = 0.160339   p<0.0001
+    NMI(D.thios,A.haemo) = 0.142959   p<0.0001
+    NMI(C.hongk,A.haemo) = 0.095633   p<0.0029
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+    NMI(A.haemo,Crohn's) = 0.115527   p<0.0007
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,C.hongk|A.haemo) = 0.108158   p<0.0001
+    NMI(D.thios,A.haemo|C.hongk) = 0.087838   p<0.0005
+    NMI(C.hongk,A.haemo|D.thios) = 0.079157   p<0.0026
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(C.hongk,Crohn's|D.thios) = 0.042766   p>0.1657
+    NMI(A.haemo,Crohn's|D.thios) = 0.033137   p>0.3446
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|C.hongk) = 0.089819   p<0.0005
+    NMI(D.thios,Crohn's|A.haemo) = 0.113155   p<0.0001
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Catabacter hongkongensis(C.hongk) and Alistipes indistinctus(A.indis)
+  Evidence that there's some link:
+    NMI(D.thios,C.hongk) = 0.160339   p<0.0001
+    NMI(D.thios,A.indis) = 0.133028   p<0.0001
+    NMI(C.hongk,A.indis) = 0.126501   p<0.0002
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+    NMI(A.indis,Crohn's) = 0.094501   p<0.0031
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,C.hongk|A.indis) = 0.137656   p<0.0001
+    NMI(D.thios,A.indis|C.hongk) = 0.111659   p<0.0001
+    NMI(C.hongk,A.indis|D.thios) = 0.127962   p<0.0001
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(C.hongk,Crohn's|D.thios) = 0.042766   p>0.1657
+    NMI(A.indis,Crohn's|D.thios) = 0.043997   p>0.1504
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|C.hongk) = 0.089819   p<0.0005
+    NMI(D.thios,Crohn's|A.indis) = 0.134116   p<0.0001
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Catabacter hongkongensis(C.hongk) and Holdemania filiformis(H.filif)
+  Evidence that there's some link:
+    NMI(B.visce,C.hongk) = 0.112537   p<0.0009
+    NMI(B.visce,H.filif) = 0.100133   p<0.0023
+    NMI(C.hongk,H.filif) = 0.133388   p<0.0001
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+    NMI(H.filif,Crohn's) = 0.086717   p<0.0059
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,C.hongk|H.filif) = 0.071402   p<0.0081
+    NMI(B.visce,H.filif|C.hongk) = 0.088868   p<0.0005
+    NMI(C.hongk,H.filif|B.visce) = 0.099329   p<0.0001
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(C.hongk,Crohn's|B.visce) = 0.049439   p>0.0968
+    NMI(H.filif,Crohn's|B.visce) = 0.069677   p>0.0103
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|C.hongk) = 0.096109   p<0.0002
+    NMI(B.visce,Crohn's|H.filif) = 0.099552   p<0.0001
+
+Evidence that Desulfonispora thiosulfatigenes(D.thios) causes Crohn's disease:
+  Helper bacteria: Catabacter hongkongensis(C.hongk) and Sporobacter termitidis(S.termi)
+  Evidence that there's some link:
+    NMI(D.thios,C.hongk) = 0.160339   p<0.0001
+    NMI(D.thios,S.termi) = 0.148404   p<0.0001
+    NMI(C.hongk,S.termi) = 0.150085   p<0.0001
+    NMI(D.thios,Crohn's) = 0.280398   p<0.0001
+    NMI(C.hongk,Crohn's) = 0.148769   p<0.0001
+    NMI(S.termi,Crohn's) = 0.079825   p<0.0090
+  Evidence that some common factor causes all three bacteria:
+    NMI(D.thios,C.hongk|S.termi) = 0.074492   p<0.0049
+    NMI(D.thios,S.termi|C.hongk) = 0.102603   p<0.0001
+    NMI(C.hongk,S.termi|D.thios) = 0.115365   p<0.0001
+  Evidence that Desulfonispora thiosulfatigenes screens the other bacteria from Crohn's disease:
+    NMI(C.hongk,Crohn's|D.thios) = 0.042766   p>0.1657
+    NMI(S.termi,Crohn's|D.thios) = 0.025107   p>0.5761
+  Sanity check, the other bacteria do not screen Desulfonispora thiosulfatigenes from Crohn's disease:
+    NMI(D.thios,Crohn's|C.hongk) = 0.089819   p<0.0005
+    NMI(D.thios,Crohn's|S.termi) = 0.072761   p<0.0063
+
+Evidence that Butyricimonas virosa(B.viros) causes Crohn's disease:
+  Helper bacteria: Prevotella loescheii(P.loesc) and Gracilibacter thermotolerans(G.therm)
+  Evidence that there's some link:
+    NMI(B.viros,P.loesc) = 0.139634   p<0.0001
+    NMI(B.viros,G.therm) = 0.168403   p<0.0001
+    NMI(P.loesc,G.therm) = 0.179799   p<0.0001
+    NMI(B.viros,Crohn's) = 0.187184   p<0.0001
+    NMI(P.loesc,Crohn's) = 0.153802   p<0.0001
+    NMI(G.therm,Crohn's) = 0.092955   p<0.0035
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.viros,P.loesc|G.therm) = 0.072218   p<0.0071
+    NMI(B.viros,G.therm|P.loesc) = 0.088121   p<0.0005
+    NMI(P.loesc,G.therm|B.viros) = 0.076704   p<0.0037
+  Evidence that Butyricimonas virosa screens the other bacteria from Crohn's disease:
+    NMI(P.loesc,Crohn's|B.viros) = 0.041403   p>0.1857
+    NMI(G.therm,Crohn's|B.viros) = 0.036267   p>0.2778
+  Sanity check, the other bacteria do not screen Butyricimonas virosa from Crohn's disease:
+    NMI(B.viros,Crohn's|P.loesc) = 0.073743   p<0.0056
+    NMI(B.viros,Crohn's|G.therm) = 0.101013   p<0.0001
+
+Evidence that Butyricimonas virosa(B.viros) causes Crohn's disease:
+  Helper bacteria: Alistipes indistinctus(A.indis) and Sporobacter termitidis(S.termi)
+  Evidence that there's some link:
+    NMI(B.viros,A.indis) = 0.137721   p<0.0001
+    NMI(B.viros,S.termi) = 0.114345   p<0.0008
+    NMI(A.indis,S.termi) = 0.137470   p<0.0001
+    NMI(B.viros,Crohn's) = 0.187184   p<0.0001
+    NMI(A.indis,Crohn's) = 0.094501   p<0.0031
+    NMI(S.termi,Crohn's) = 0.079825   p<0.0090
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.viros,A.indis|S.termi) = 0.078661   p<0.0027
+    NMI(B.viros,S.termi|A.indis) = 0.102372   p<0.0001
+    NMI(A.indis,S.termi|B.viros) = 0.112180   p<0.0001
+  Evidence that Butyricimonas virosa screens the other bacteria from Crohn's disease:
+    NMI(A.indis,Crohn's|B.viros) = 0.033230   p>0.3431
+    NMI(S.termi,Crohn's|B.viros) = 0.051181   p>0.0819
+  Sanity check, the other bacteria do not screen Butyricimonas virosa from Crohn's disease:
+    NMI(B.viros,Crohn's|A.indis) = 0.090456   p<0.0005
+    NMI(B.viros,Crohn's|S.termi) = 0.076259   p<0.0039
+
+Evidence that Butyricimonas virosa(B.viros) causes Crohn's disease:
+  Helper bacteria: Alistipes indistinctus(A.indis) and Eubacterium ruminantium(E.rumin)
+  Evidence that there's some link:
+    NMI(B.viros,A.indis) = 0.137721   p<0.0001
+    NMI(B.viros,E.rumin) = 0.099391   p<0.0024
+    NMI(A.indis,E.rumin) = 0.102603   p<0.0017
+    NMI(B.viros,Crohn's) = 0.187184   p<0.0001
+    NMI(A.indis,Crohn's) = 0.094501   p<0.0031
+    NMI(E.rumin,Crohn's) = 0.151585   p<0.0001
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.viros,A.indis|E.rumin) = 0.100457   p<0.0001
+    NMI(B.viros,E.rumin|A.indis) = 0.078840   p<0.0027
+    NMI(A.indis,E.rumin|B.viros) = 0.075328   p<0.0044
+  Evidence that Butyricimonas virosa screens the other bacteria from Crohn's disease:
+    NMI(A.indis,Crohn's|B.viros) = 0.033230   p>0.3431
+    NMI(E.rumin,Crohn's|B.viros) = 0.051651   p>0.0765
+  Sanity check, the other bacteria do not screen Butyricimonas virosa from Crohn's disease:
+    NMI(B.viros,Crohn's|A.indis) = 0.090456   p<0.0005
+    NMI(B.viros,Crohn's|E.rumin) = 0.082821   p<0.0014
+
+Evidence that Butyricimonas virosa(B.viros) causes Crohn's disease:
+  Helper bacteria: Paraprevotella clara(P.clara) and Eubacterium ruminantium(E.rumin)
+  Evidence that there's some link:
+    NMI(B.viros,P.clara) = 0.113038   p<0.0008
+    NMI(B.viros,E.rumin) = 0.099391   p<0.0024
+    NMI(P.clara,E.rumin) = 0.154058   p<0.0001
+    NMI(B.viros,Crohn's) = 0.187184   p<0.0001
+    NMI(P.clara,Crohn's) = 0.124047   p<0.0003
+    NMI(E.rumin,Crohn's) = 0.151585   p<0.0001
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.viros,P.clara|E.rumin) = 0.077544   p<0.0029
+    NMI(B.viros,E.rumin|P.clara) = 0.071450   p<0.0081
+    NMI(P.clara,E.rumin|B.viros) = 0.089450   p<0.0005
+  Evidence that Butyricimonas virosa screens the other bacteria from Crohn's disease:
+    NMI(P.clara,Crohn's|B.viros) = 0.046869   p>0.1190
+    NMI(E.rumin,Crohn's|B.viros) = 0.051651   p>0.0765
+  Sanity check, the other bacteria do not screen Butyricimonas virosa from Crohn's disease:
+    NMI(B.viros,Crohn's|P.clara) = 0.093212   p<0.0005
+    NMI(B.viros,Crohn's|E.rumin) = 0.082821   p<0.0014
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Acinetobacter haemolyticus(A.haemo) and Paraprevotella clara(P.clara)
+  Evidence that there's some link:
+    NMI(B.visce,A.haemo) = 0.118989   p<0.0004
+    NMI(B.visce,P.clara) = 0.152813   p<0.0001
+    NMI(A.haemo,P.clara) = 0.151723   p<0.0001
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(A.haemo,Crohn's) = 0.115527   p<0.0007
+    NMI(P.clara,Crohn's) = 0.124047   p<0.0003
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,A.haemo|P.clara) = 0.082912   p<0.0014
+    NMI(B.visce,P.clara|A.haemo) = 0.099687   p<0.0001
+    NMI(A.haemo,P.clara|B.visce) = 0.070970   p<0.0086
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(A.haemo,Crohn's|B.visce) = 0.034296   p>0.3215
+    NMI(P.clara,Crohn's|B.visce) = 0.073222   p>0.0062
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|A.haemo) = 0.109013   p<0.0001
+    NMI(B.visce,Crohn's|P.clara) = 0.123094   p<0.0001
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Acinetobacter haemolyticus(A.haemo) and Sporobacter termitidis(S.termi)
+  Evidence that there's some link:
+    NMI(B.visce,A.haemo) = 0.118989   p<0.0004
+    NMI(B.visce,S.termi) = 0.148717   p<0.0001
+    NMI(A.haemo,S.termi) = 0.105667   p<0.0012
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(A.haemo,Crohn's) = 0.115527   p<0.0007
+    NMI(S.termi,Crohn's) = 0.079825   p<0.0090
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,A.haemo|S.termi) = 0.075291   p<0.0044
+    NMI(B.visce,S.termi|A.haemo) = 0.120704   p<0.0001
+    NMI(A.haemo,S.termi|B.visce) = 0.080663   p<0.0020
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(A.haemo,Crohn's|B.visce) = 0.034296   p>0.3215
+    NMI(S.termi,Crohn's|B.visce) = 0.040908   p>0.1937
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|A.haemo) = 0.109013   p<0.0001
+    NMI(B.visce,Crohn's|S.termi) = 0.074552   p<0.0049
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Acinetobacter haemolyticus(A.haemo) and Staphylococcus pseudintermedius(S.pseud)
+  Evidence that there's some link:
+    NMI(B.visce,A.haemo) = 0.118989   p<0.0004
+    NMI(B.visce,S.pseud) = 0.084913   p<0.0068
+    NMI(A.haemo,S.pseud) = 0.129323   p<0.0001
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(A.haemo,Crohn's) = 0.115527   p<0.0007
+    NMI(S.pseud,Crohn's) = 0.104831   p<0.0013
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,A.haemo|S.pseud) = 0.114251   p<0.0001
+    NMI(B.visce,S.pseud|A.haemo) = 0.085751   p<0.0005
+    NMI(A.haemo,S.pseud|B.visce) = 0.089829   p<0.0005
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(A.haemo,Crohn's|B.visce) = 0.034296   p>0.3215
+    NMI(S.pseud,Crohn's|B.visce) = 0.070989   p>0.0085
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|A.haemo) = 0.109013   p<0.0001
+    NMI(B.visce,Crohn's|S.pseud) = 0.116223   p<0.0001
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Desulfovibrio desulfuricans(D.desul) and Paraprevotella clara(P.clara)
+  Evidence that there's some link:
+    NMI(B.visce,D.desul) = 0.145876   p<0.0001
+    NMI(B.visce,P.clara) = 0.152813   p<0.0001
+    NMI(D.desul,P.clara) = 0.121224   p<0.0004
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(D.desul,Crohn's) = 0.132261   p<0.0001
+    NMI(P.clara,Crohn's) = 0.124047   p<0.0003
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,D.desul|P.clara) = 0.100624   p<0.0001
+    NMI(B.visce,P.clara|D.desul) = 0.080961   p<0.0019
+    NMI(D.desul,P.clara|B.visce) = 0.070062   p<0.0098
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(D.desul,Crohn's|B.visce) = 0.064909   p>0.0181
+    NMI(P.clara,Crohn's|B.visce) = 0.052605   p>0.0679
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|D.desul) = 0.094190   p<0.0003
+    NMI(B.visce,Crohn's|P.clara) = 0.123094   p<0.0001
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Desulfovibrio desulfuricans(D.desul) and Phascolarctobacterium faecium(P.faeci)
+  Evidence that there's some link:
+    NMI(B.visce,D.desul) = 0.145876   p<0.0001
+    NMI(B.visce,P.faeci) = 0.192020   p<0.0001
+    NMI(D.desul,P.faeci) = 0.107345   p<0.0011
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(D.desul,Crohn's) = 0.132261   p<0.0001
+    NMI(P.faeci,Crohn's) = 0.120578   p<0.0004
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,D.desul|P.faeci) = 0.075029   p<0.0045
+    NMI(B.visce,P.faeci|D.desul) = 0.127859   p<0.0001
+    NMI(D.desul,P.faeci|B.visce) = 0.082968   p<0.0013
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(D.desul,Crohn's|B.visce) = 0.064909   p>0.0181
+    NMI(P.faeci,Crohn's|B.visce) = 0.060503   p>0.0313
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|D.desul) = 0.094190   p<0.0003
+    NMI(B.visce,Crohn's|P.faeci) = 0.071850   p<0.0076
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Butyrivibrio crossotus(B.cross) and Eubacterium ruminantium(E.rumin)
+  Evidence that there's some link:
+    NMI(B.visce,B.cross) = 0.089929   p<0.0048
+    NMI(B.visce,E.rumin) = 0.108927   p<0.0010
+    NMI(B.cross,E.rumin) = 0.081244   p<0.0079
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(B.cross,Crohn's) = 0.099102   p<0.0027
+    NMI(E.rumin,Crohn's) = 0.151585   p<0.0001
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,B.cross|E.rumin) = 0.098278   p<0.0001
+    NMI(B.visce,E.rumin|B.cross) = 0.080603   p<0.0020
+    NMI(B.cross,E.rumin|B.visce) = 0.078925   p<0.0026
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(B.cross,Crohn's|B.visce) = 0.059082   p>0.0361
+    NMI(E.rumin,Crohn's|B.visce) = 0.044424   p>0.1455
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|B.cross) = 0.092056   p<0.0005
+    NMI(B.visce,Crohn's|E.rumin) = 0.113393   p<0.0001
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Paraprevotella clara(P.clara) and Eubacterium ruminantium(E.rumin)
+  Evidence that there's some link:
+    NMI(B.visce,P.clara) = 0.152813   p<0.0001
+    NMI(B.visce,E.rumin) = 0.108927   p<0.0010
+    NMI(P.clara,E.rumin) = 0.154058   p<0.0001
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(P.clara,Crohn's) = 0.124047   p<0.0003
+    NMI(E.rumin,Crohn's) = 0.151585   p<0.0001
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,P.clara|E.rumin) = 0.112445   p<0.0001
+    NMI(B.visce,E.rumin|P.clara) = 0.088019   p<0.0005
+    NMI(P.clara,E.rumin|B.visce) = 0.081167   p<0.0018
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(P.clara,Crohn's|B.visce) = 0.044841   p>0.1403
+    NMI(E.rumin,Crohn's|B.visce) = 0.050732   p>0.0859
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|P.clara) = 0.123094   p<0.0001
+    NMI(B.visce,Crohn's|E.rumin) = 0.113393   p<0.0001
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Phascolarctobacterium faecium(P.faeci) and Sporobacter termitidis(S.termi)
+  Evidence that there's some link:
+    NMI(B.visce,P.faeci) = 0.192020   p<0.0001
+    NMI(B.visce,S.termi) = 0.148717   p<0.0001
+    NMI(P.faeci,S.termi) = 0.142666   p<0.0001
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(P.faeci,Crohn's) = 0.120578   p<0.0004
+    NMI(S.termi,Crohn's) = 0.079825   p<0.0090
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,P.faeci|S.termi) = 0.121454   p<0.0001
+    NMI(B.visce,S.termi|P.faeci) = 0.080232   p<0.0023
+    NMI(P.faeci,S.termi|B.visce) = 0.104806   p<0.0001
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(P.faeci,Crohn's|B.visce) = 0.062576   p>0.0246
+    NMI(S.termi,Crohn's|B.visce) = 0.024695   p>0.5872
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|P.faeci) = 0.071850   p<0.0076
+    NMI(B.visce,Crohn's|S.termi) = 0.074552   p<0.0049
+
+Evidence that Barnesiella viscericola(B.visce) causes Crohn's disease:
+  Helper bacteria: Phascolarctobacterium faecium(P.faeci) and Holdemania filiformis(H.filif)
+  Evidence that there's some link:
+    NMI(B.visce,P.faeci) = 0.192020   p<0.0001
+    NMI(B.visce,H.filif) = 0.100133   p<0.0023
+    NMI(P.faeci,H.filif) = 0.090301   p<0.0046
+    NMI(B.visce,Crohn's) = 0.200266   p<0.0001
+    NMI(P.faeci,Crohn's) = 0.120578   p<0.0004
+    NMI(H.filif,Crohn's) = 0.086717   p<0.0059
+  Evidence that some common factor causes all three bacteria:
+    NMI(B.visce,P.faeci|H.filif) = 0.130119   p<0.0001
+    NMI(B.visce,H.filif|P.faeci) = 0.071179   p<0.0084
+    NMI(P.faeci,H.filif|B.visce) = 0.087831   p<0.0005
+  Evidence that Barnesiella viscericola screens the other bacteria from Crohn's disease:
+    NMI(P.faeci,Crohn's|B.visce) = 0.062576   p>0.0246
+    NMI(H.filif,Crohn's|B.visce) = 0.059069   p>0.0362
+  Sanity check, the other bacteria do not screen Barnesiella viscericola from Crohn's disease:
+    NMI(B.visce,Crohn's|P.faeci) = 0.071850   p<0.0076
+    NMI(B.visce,Crohn's|H.filif) = 0.099552   p<0.0001
+

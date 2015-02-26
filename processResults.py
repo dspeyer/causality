@@ -16,7 +16,7 @@ tots=defaultdict(lambda:0)
 g=glob.glob(argv[1])
 for fn in g:
     try:
-        srr=re.match('.*/SRR([0-9]*).results',fn).group(1)
+        srr=re.match('.*/[A-Z]*([0-9]*).results',fn).group(1)
     except:
         print 'ERROR: '+fn
         continue
@@ -48,7 +48,7 @@ spes.sort()
 meta=file(argv[2])
 for line in meta:
     try:
-        (srr,s)= re.match('[0-9x]* SRR([0-9]*) ([A-z]*)\n',line).groups()
+        (srr,s)= re.match('[0-9x]* [A-Z]*([0-9]*) ([A-z]*)\n',line).groups()
         cnt['sick'][srr]=s
     except:
         pass
@@ -231,13 +231,3 @@ for trio in trios:
         printres(trio[1],trio[0],trio[2],mic1b0,mic0b2,mic0b1,mic2b1,mic201,mic120,mic012)
     if mic2b1<condthresh and mic2b0<condthresh and mic0b2>condthresh and mic1b2>condthresh:
         printres(trio[2],trio[0],trio[1],mic2b0,mic2b1,mic0b2,mic1b2,mic012,mic120,mic201)
-
-
-
-
-
-        print "%s(%.2f) cuts(%.2f,%.2f) %s(%.2f) and %s(%.2f) (%.2f,%.2f,%.2f)" % (trio[2],mis[trio[2]]['sick'],mic2b1,mic2b0,trio[0],mis[trio[0]]['sick'],trio[1],mis[trio[1]]['sick'],mis[trio[0]][trio[1]],mis[trio[0]][trio[2]],mis[trio[2]][trio[1]])
-        print " (noncuts: %.2f,%.2f)"%(mic0b2,mic1b2)
-        #        print "%s cuts %s and %s" % (trio[2],trio[1],trio[0])
-
-
