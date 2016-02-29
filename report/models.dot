@@ -1,0 +1,37 @@
+digraph {
+  graph [rankdir=LR,fontsize=28];
+  subgraph clusterpm {
+    N3 [label=Nod2,fontsize=28];
+    D3 [label="D.Deha",fontsize=28];
+    C3 [label=Crohns,fontsize=28];
+    N3->D3;
+    D3->C3;
+    N3->C3;
+    label = "Partially Mediated";
+  }
+  subgraph clusterm {
+    N1 [label=Nod2,fontsize=28];
+    D1 [label="D.Deha",fontsize=28];
+    C1 [label=Crohns,fontsize=28];
+    N1->D1;
+    D1->C1;
+    label = "Mediated";
+  }
+  subgraph clusternm {
+    N4 [label=Nod2,fontsize=28];
+    D4 [label="D.Deha",fontsize=28];
+    C4 [label=Crohns,fontsize=28];
+    N4->D4;
+    N4->C4;
+    D4->C4 [color=white];
+    label = "Not Mediated";
+  }
+  subgraph clustera {
+    N2 [label=Nod2,fontsize=28];
+    D2 [label="D.Deha",fontsize=28];
+    C2 [label=Crohns,fontsize=28];
+    N2->C2;
+    C2->D2;
+    label = "Anti-Mediated";
+  }
+}
