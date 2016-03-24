@@ -5,17 +5,13 @@ from random import random
 
 class RandUniq(object):
     def __init__(self):
-        self.already = [0, 1]
+        self.already = -1
     def get(self):
-        failed = True
-        while failed:
-            attempt = random()
-            failed = False
-            for i in self.already:
-                if abs(attempt-i)<.1:
-                    failed=True
-                    break
-        self.already.append(attempt)
+        while True:
+            attempt = random()*.6+.2
+            if abs(attempt-self.already)>.3:
+                break
+        self.already = attempt
         return attempt
 
 def create_net(b_depends_on, c_depends_on):
@@ -33,7 +29,8 @@ def create_net(b_depends_on, c_depends_on):
         p_c = [[ru.get(), ru.get()]]*2
     elif c_depends_on == 'both':
         ru=RandUniq()
-        p_c = [[ru.get(), ru.get()], [ru.get(), ru.get()]]
+        p_c = [[ru.get(), ru.get()], [0, ru.get()]]
+        p_c[1][0] = ru.get()
     else:
         p_c = [[random()]*2]*2
     return struct(a=p_a,
@@ -41,10 +38,12 @@ def create_net(b_depends_on, c_depends_on):
                   c_given_ab=p_c)
 
 def simulate(p, n):
-    out = [[[0,0],[0,0]],[[0,0],[0,0]]]
+    out=[[],[],[]]
     for i in range(n):
         a=(random()<p.a)
         b=(random()<p.b_given_a[a])
         c=(random()<p.c_given_ab[a][b])
-        out[a][b][c]+=1
+        out[0].append(a)
+        out[1].append(b)
+        out[2].append(c)
     return out

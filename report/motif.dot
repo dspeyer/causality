@@ -1,0 +1,29 @@
+digraph {
+  graph [rankdir=LR,fontsize=12];
+  subgraph cluster_yes {
+    H [label="Hidden Cause",fontsize=12];
+    A [label="Bacterium of Interest",fontsize=12];
+    B [label="Helper Bacterium",fontsize=12];
+    C [label="Helper Bacterium",fontsize=12];
+    D [label="Crohn's Disease",fontsize=12];
+    H->A;
+    H->B;
+    H->C;
+    A->D;
+    label = "Helper Bacteria and Disease Correlate";
+  }
+  subgraph cluster_no {
+    xH [label="Hidden Cause",fontsize=12];
+    xH2 [label="Other Hidden Cause",fontsize=12];
+    xA [label="Bacterium of Interest",fontsize=12];
+    xB [label="Helper Bacterium",fontsize=12];
+    xC [label="Helper Bacterium",fontsize=12];
+    xD [label="Crohn's Disease",fontsize=12];
+    xH->xA;
+    xH->xB;
+    xH->xC;
+    xH2->xA;
+    xH2->xD;
+    label = "Helper Bacteria and Disease Do Not Correlate";
+  }
+}
