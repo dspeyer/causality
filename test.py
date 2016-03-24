@@ -46,13 +46,24 @@ if (cnts != [[1, 2, 1],
     print 'Counting Error'
 
 
-net = create_net('a','b')
-print net
-print
+# net = create_net('a','b')
+# print net
+# print
 
-data = simulate(net, 100)
-print 'Really everything: %s' % count(zip(data[0],data[2],data[1]),[2,2,2])
-severs(data[0], data[2], data[1])
-print
-print 'Really everything: %s' % count(zip(data[0],data[1],data[2]),[2,2,2])
-severs(data[0], data[1], data[2])
+# data = simulate(net, 100)
+# print 'Really everything: %s' % count(zip(data[0],data[2],data[1]),[2,2,2])
+# severs(data[0], data[2], data[1])
+# print
+# print 'Really everything: %s' % count(zip(data[0],data[1],data[2]),[2,2,2])
+# severs(data[0], data[1], data[2])
+
+
+expect(findcutoff(range(10), [True, True, True, False, False, False, False, False, False, False, False, False, False]),
+       struct(threshold=2.5, sick_when_more=False), 'cutoff')
+
+expect(findcutoff(range(10), [False, False, False, True, True, True, True, True, True, True]),
+       struct(threshold=2.5, sick_when_more=True), 'cutoff')
+expect(findcutoff(range(10), [False, False, False, False, False, False, False, True, True, True]),
+       struct(threshold=6.5, sick_when_more=True), 'cutoff')
+expect(findcutoff(range(10), [True, False, False, False, False, False, False, True, True, True]),
+       struct(threshold=6.0, sick_when_more=True), 'cutoff')

@@ -16,9 +16,15 @@ class struct(object):
         return key in self.__dict__
     def __str__(self):
         return str(self.__dict__)
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+    def __ne__(self, other):
+        return self.__dict__ != other.__dict__
 
-def count(data, limits):
+def count(data, limits=None):
 #    print data
+    if limits==None:
+        limits=[2]*len(data[0])
     out=0
     for limit in reversed(limits):
         out=[out]
@@ -115,3 +121,36 @@ def severs(a, b, mid):
         print 'Actual: %s' % cntsplit[mv]
         chi = chisquare(cntsplit[mv], exp, axis=None)
         print chi
+
+def findcutoff(bact, dis):
+    healthy=[]
+    sick=[]
+    for i in range(len(bact)):
+        if dis[i]:
+            sick.append(bact[i])
+        else:
+            healthy.append(bact[i])
+    sick.sort()
+    healthy.sort(reverse=True)
+    for i in range(min(len(sick),len(healthy))):
+        if healthy[i]<sick[i]:
+            return struct(threshold=(healthy[i]+sick[i])/2.0, sick_when_more=True)
+    sick.reverse()
+    healthy.reverse()
+    for i in range(min(len(sick),len(healthy))):
+        if healthy[i]>sick[i]:
+            return struct(threshold=(healthy[i]+sick[i])/2.0, sick_when_more=False)
+    return struct(sick_when_more=None)
+
+def expect(val, ex, desc):
+    if val!=ex:
+        print 'Bad %s: expected %s got %s' % (desc, ex, val)
+
+
+
+
+
+
+
+
+    

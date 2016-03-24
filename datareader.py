@@ -61,7 +61,7 @@ class Data:
                     patient.raw_counts[species] += n
                     patient.total_count += n
                     self.bacteria[species] = True
-            patient.fractions = {}
+            patient.fractions = defaultdict(lambda:0.0)
             for species in patient.raw_counts:
                 if species > 1:
                     patient.fractions[species] = float(patient.raw_counts[species]) / patient.total_count
