@@ -67,3 +67,22 @@ expect(findcutoff(range(10), [False, False, False, False, False, False, False, T
        struct(threshold=6.5, sick_when_more=True), 'cutoff')
 expect(findcutoff(range(10), [True, False, False, False, False, False, False, True, True, True]),
        struct(threshold=6.0, sick_when_more=True), 'cutoff')
+
+
+
+a = [1, 1, 0, 0, 1, 1, 0, 0,  1, 0, 0, 1, 0, 0, 1, 0, 0]*1000
+b = [1, 0, 1, 0, 1, 0, 1, 0,  1, 0, 0, 0, 1, 0, 0, 0, 1]*1000
+c = [1, 1, 1, 1, 1, 1, 1, 1,  0, 0, 0, 0, 0, 0, 0, 0, 0]*1000
+
+expect(link(a,b), lambda x:x<.01, 'Related things should link')
+expect(link_despite(a,b,c), 1, 'Intermediary should cut')
+expect(link_despite(a,c,b), lambda x:x<.01, 'Nonintermediary should not cut')
+
+
+a = [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]*1000
+b = [1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1]*1000
+c = [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0]*1000
+
+#print severs(a,b,c)
+#print severs(a,c,b)
+print severs(b,c,a)

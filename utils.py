@@ -5,6 +5,8 @@ from copy import deepcopy
 from collections import defaultdict
 from math import log
 from scipy.stats import chisquare
+from scipy.stats import chi2_contingency
+from scipy.stats import chi2
 
 class struct(object):
     def __init__(self,**kwargs):
@@ -107,20 +109,20 @@ def mularr(arr, f):
         else:
             arr[i]*=f
 
-def severs(a, b, mid):
-    cntall=count(zip(a,b), [2,2])
-    cntsplit=count(zip(mid,a,b), [2,2,2])
-    cntmid=count(zip(mid), [2])
-    tot = sum(cntmid)
-    mularr(cntmid, 1.0 / tot)
-    print 'Everything: %s' % cntall
-    for mv in range(2):
-        exp=deepcopy(cntall)
-        mularr(exp, cntmid[mv])
-        print 'Expected: %s' % exp
-        print 'Actual: %s' % cntsplit[mv]
-        chi = chisquare(cntsplit[mv], exp, axis=None)
-        print chi
+# def severs(a, b, mid):
+#     cntall=count(zip(a,b), [2,2])
+#     cntsplit=count(zip(mid,a,b), [2,2,2])
+#     cntmid=count(zip(mid), [2])
+#     tot = sum(cntmid)
+#     mularr(cntmid, 1.0 / tot)
+#     print 'Everything: %s' % cntall
+#     for mv in range(2):
+#         exp=deepcopy(cntall)
+#         mularr(exp, cntmid[mv])
+#         print 'Expected: %s' % exp
+#         print 'Actual: %s' % cntsplit[mv]
+#         chi = chisquare(cntsplit[mv], exp, axis=None)
+#         print chi
 
 def findcutoff(bact, dis):
     healthy=[]
@@ -132,6 +134,8 @@ def findcutoff(bact, dis):
             healthy.append(bact[i])
     sick.sort()
     healthy.sort(reverse=True)
+#    print 'sick levels %s'%sick
+#    print 'healthy levels %s'%healthy
     for i in range(min(len(sick),len(healthy))):
         if healthy[i]<sick[i]:
             return struct(threshold=(healthy[i]+sick[i])/2.0, sick_when_more=True)
@@ -143,14 +147,88 @@ def findcutoff(bact, dis):
     return struct(sick_when_more=None)
 
 def expect(val, ex, desc):
-    if val!=ex:
+    if type(ex)==type(lambda:0):
+        exf = ex
+    else:
+        exf = (lambda x: x==ex)
+    if not exf(val):
         print 'Bad %s: expected %s got %s' % (desc, ex, val)
 
 
+def p_of_val(p, v):
+    if v:
+        return p
+    else:
+        return 1-p
+
+def direction(cause, effect, unknown, n, p_cause, p_effect_given_cause):
+    cnt = count(zip(effect, unknown))
+    chi_indep = chi2_contingency(cnt)[1]
+    p_unknown_given_effect = [ float(cnt[0][1]) / sum(cnt[0]),
+                               float(cnt[1][1]) / sum(cnt[1]) ]
+    #print 'p(bact|cd)=%s' % p_unknown_given_effect
+    exp=[[0,0],[0,0]]
+    for c in range(2):
+        for e in range(2):
+            for u in range(2):
+                exp[c][u] += (n * 
+                              p_of_val(p_cause, c) *
+                              p_of_val(p_effect_given_cause[c], e) *
+                              p_of_val(p_unknown_given_effect[e], u))
+    cnt = count(zip(cause, unknown))
+    #print 'cnt=%s' % cnt
+    #print 'expected if cd->bact=%s' % exp
+    chi_rev = chisquare(cnt, exp, axis=None, ddof=2)
+    chi_fwd = chi2_contingency(cnt)
+    #print 'expected if bact->cd=%s' % chi_fwd[3]
+    bayes_factor = chi2.pdf(chi_fwd[0],1) / chi2.pdf(chi_rev.statistic,1)
+    return struct(reject_indep=chi_indep,
+                  bayes_fwd_rev=bayes_factor,
+                  reject_fwd=chi_fwd[1],
+                  reject_rev=chi_rev.pvalue)
 
 
+def div(a, b):
+    if type(a)==type(0):
+        return float(a)/b
+    else:
+        return [div(ai,bi) for (ai,bi) in zip(a,b)]
 
 
+def link(a,b):
+    cnt = count(zip(a, b))
+    return chi2_contingency(cnt)[1]
 
+def link_despite(a,b,despite):
+    cnt = count(zip(despite, a, b))
+    ps=[0,0]
+    for i in [0,1]:
+        try:
+            ps[i]=chi2_contingency(cnt[i])[1]
+        except ValueError:
+            ps[i]=1
+    return min(ps)
 
-    
+def severs(a,b,cut):
+    cntall = count(zip(a,b))
+    cntcut = count(zip(cut,a,b))
+    pvar = count(zip(cut))
+    mularr(pvar, 1.0/sum(pvar))
+    expnsev = [deepcopy(cntall), deepcopy(cntall)]
+    print expnsev
+    print pvar
+    for i in [0,1]:
+        mularr(expnsev[i], pvar[i])
+    bayes_factor = 1
+    for i in [0,1]:
+        chi_sev = chi2_contingency(cntcut[i])
+        chi_nsev = chisquare(cntcut[i], expnsev[i], axis=None, ddof=2)
+        peg_sev = chi2.pdf(chi_sev[0],1) 
+        peg_nsev = chi2.pdf(chi_nsev.statistic,1)
+        print "For sevval %d" % i
+        print "Seen     = %s" % cntcut[i]
+        print "Exp|Sev = %s" % chi_sev[3]
+        print "Exp|~Sev  = %s" % expnsev[i]
+        print "bf = %g / %g = %g" % (peg_sev, peg_nsev, peg_sev/peg_nsev)
+        bayes_factor *= peg_sev/peg_nsev 
+    return bayes_factor

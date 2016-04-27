@@ -3,15 +3,10 @@
 from datareader import Data
 from utils import *
 from scipy.stats import chi2_contingency
+from scipy.stats import chi2
 from scipy.stats import chisquare
 from math import log
 from sys import stdout
-
-def p_of_val(p, v):
-    if v:
-        return p
-    else:
-        return 1-p
 
 def print_222(data):
     txt=['! ','']
@@ -53,7 +48,8 @@ print 'P-value rejecting nod2 indep CD: %.4f' % chi[1]
 print 'Total bacterial species: %d' % len(data.bacteria)
 interesting = 0
 match_disease = 0
-for species in ['Lactobacillus acidophilus']: #data.bacteria:
+print '%s \t sickwhen \t rej ind \t bayes' % ('species'.ljust(32))
+for species in data.bacteria: #['Lactobacillus acidophilus']:#
     vals = data.get_data(pl, 'fractions', species, bucketizer=lambda(x):int(log(x,10)))
     if entropy(vals)<0.5:
         continue
@@ -65,44 +61,14 @@ for species in ['Lactobacillus acidophilus']: #data.bacteria:
     boolvals = []
     for i in vals:
         boolvals.append((i>co.threshold)==(co.sick_when_more))
-    cnt = count(zip(sick, boolvals))
-    print cnt
-    chi_indep = chi2_contingency(cnt)[1]
-    if chi_indep>1e-3:
-        continue
-    match_disease += 1
-    p_bact_given_cd = [ float(cnt[0][1]) / sum(cnt[0]),
-                        float(cnt[1][1]) / sum(cnt[1]) ]
-#    print 'p(%s|cd)=%s' % (species[:5], p_bact_given_cd)
-    # cntall = count(zip(nod2, sick, boolvals))
-    # print 'cntall'
-    # print_222(cntall)
-    # exp=[[[0,0],[0,0]],[[0,0],[0,0]]]
-    # for n in range(2):
-    #     for s in range(2):
-    #         for b in range(2):
-    #             exp[n][s][b] = (len(pl) * 
-    #                             p_of_val(p_nod2, n) *
-    #                             p_of_val(p_cd_given_nod2[n], s) *
-    #                             p_of_val(p_bact_given_cd[s], b))
-    # print 'exp'
-    # print_222(exp)
-    # chi_rev = chisquare(cntall, exp, axis=None, ddof=4) ## ddof???
-    # print '%s \t %.2e \t %.4f' % (species, chi_indep, chi_rev.pvalue)
-    exp=[[0,0],[0,0]]
-    for n in range(2):
-        for b in range(2):
-            for s in range(2):
-                exp[n][b] += (len(pl) * 
-                              p_of_val(p_nod2, n) *
-                              p_of_val(p_cd_given_nod2[n], s) *
-                              p_of_val(p_bact_given_cd[s], b))                
-    cnt = count(zip(nod2, boolvals))
-    chi_rev = chisquare(cnt, exp, axis=None, ddof=2)
+    dir=direction(nod2, sick, boolvals, len(pl), p_nod2, p_cd_given_nod2)
     dirtxt=['<','>']
-    if chi_rev.pvalue < .05:
-        print '%s \t %s%.2e \t %.2e \t %.4f' % (species, dirtxt[co.sick_when_more], co.threshold, chi_indep, chi_rev.pvalue)    
-
+    if dir.reject_indep < 1e-2 and dir.bayes_fwd_rev > 2:
+        print '%s \t %s%.2e \t %.2e \t %.1f \t %.1g \t %.1g' % (species.ljust(32), dirtxt[co.sick_when_more], co.threshold, dir.reject_indep, dir.bayes_fwd_rev, dir.reject_fwd, dir.reject_rev)
+#        print '%s \t& %s%.2e \t& %.2e \t& %.1f' % (species.ljust(32), dirtxt[co.sick_when_more], co.threshold, dir.reject_indep, dir.bayes_fwd_rev)
+#        print 'p_cd_given_n2_b = %s' % div(count(zip(sick,nod2,boolvals))[1], count(zip(nod2,boolvals)))
+#    if dir.reject_indep < 1e-2 and dir.bayes_fwd_rev < 2:
+#        print 'p_b_given_cd = %s' % div(count(zip(boolvals,sick))[1], count(zip(sick)))
         
 print 'Interesting bacterial species: %d' % interesting
 print 'Species that correlated to CD: %d' % match_disease
