@@ -212,23 +212,46 @@ def link_despite(a,b,despite):
 def severs(a,b,cut):
     cntall = count(zip(a,b))
     cntcut = count(zip(cut,a,b))
+    p_b_given_a = [float(x[1])/sum(x) for x in cntall]
+    p_a_given_b = [float(x[1])/sum(x) for x in zip(*cntall)]
+    #print 'orig=%s' % cntall
+    #print 'split=%s' % cntcut
+    ##print 'p_a_given_b = %s' % p_a_given_b
+    ##print 'p_b_given_a = %s' % p_b_given_a
     pvar = count(zip(cut))
     mularr(pvar, 1.0/sum(pvar))
     expnsev = [deepcopy(cntall), deepcopy(cntall)]
-    print expnsev
-    print pvar
     for i in [0,1]:
         mularr(expnsev[i], pvar[i])
-    bayes_factor = 1
+    exptoucha = deepcopy(expnsev) # We'll overwrite everything
     for i in [0,1]:
-        chi_sev = chi2_contingency(cntcut[i])
-        chi_nsev = chisquare(cntcut[i], expnsev[i], axis=None, ddof=2)
-        peg_sev = chi2.pdf(chi_sev[0],1) 
-        peg_nsev = chi2.pdf(chi_nsev.statistic,1)
-        print "For sevval %d" % i
-        print "Seen     = %s" % cntcut[i]
-        print "Exp|Sev = %s" % chi_sev[3]
-        print "Exp|~Sev  = %s" % expnsev[i]
-        print "bf = %g / %g = %g" % (peg_sev, peg_nsev, peg_sev/peg_nsev)
-        bayes_factor *= peg_sev/peg_nsev 
-    return bayes_factor
+        for aval in [0,1]:
+            n = cntcut[i][aval][0] + cntcut[i][aval][1]
+            for bval in [0,1]:
+                p = p_of_val(p_b_given_a[aval], bval)
+                exptoucha[i][aval][bval] = n * p
+                ##print 'for cut=%d a=%d b=%d, n=%d p=%.1f val=%.1f' % (i, aval, bval, n, p, exptoucha[i][aval][bval])
+    exptouchb = deepcopy(expnsev) # We'll overwrite everything
+    for i in [0,1]:
+        for bval in [0,1]:
+            n = cntcut[i][0][bval] + cntcut[i][1][bval]
+            for aval in [0,1]:
+                exptouchb[i][aval][bval] = n * p_of_val(p_a_given_b[bval], aval)
+    #print 'exp|touch a = %s' % exptoucha
+    #print 'exp|touch b = %s' % exptouchb
+    exps = [expnsev, exptoucha, exptouchb]
+    bayes_factor = [1, 1, 1]
+    chi_sev = chi2_contingency(cntcut[i])
+    peg_sev = chi2.pdf(chi_sev[0],1) 
+    for model in [0,1,2]:
+        #print 'Model Touches %s' % (['neither', 'a', 'b'])[model]
+        for i in [0,1]:
+            #print ' Cut=%d' % i
+            #print ' Actual: %s' % cntcut[i]
+            #print ' Expected: %s' % exps[model][i]
+            chi_nsev = chisquare(cntcut[i], exps[model][i], axis=None, ddof=2)
+            peg_nsev = chi2.pdf(chi_nsev[0],1)
+            #print ' Chi=%s' % str(chi_nsev)
+            #print ' p=%s' % peg_nsev
+            bayes_factor[model] *= peg_sev/peg_nsev 
+    return min(bayes_factor)
