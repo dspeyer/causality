@@ -53,6 +53,20 @@ for i in range(len(bacteria)):
                      link_despite(a,b,c) < threshold and
                      link_despite(a,c,b) < threshold and
                      link_despite(b,c,a) < threshold):
-                    print 'Trio: %s, %s, %s' % (bacteria[i].species, bacteria[j].species, bacteria[k].species)
+                    #print 'Trio: %s, %s, %s' % (bacteria[i].species, bacteria[j].species, bacteria[k].species)
+                    for ii in [i,j,k]:
+                        for hi in [i,j,k]:
+                            if ii==hi:
+                                continue
+                            s=set([i,j,k])
+                            s.remove(ii)
+                            s.remove(hi)
+                            oi=s.pop()
+                            interest=bacteria[ii].data
+                            helper=bacteria[hi].data
+                            if ( severs(helper, sick, interest) > 10 and 
+                                 severs(interest, sick, helper) < 1):
+                                print '%s, %s, %.1f, %s, %.1g' % (bacteria[ii].species, bacteria[hi].species, severs(helper, sick, interest),
+                                                                        bacteria[oi].species, max( link(a,b), link(a,c), link(b,c), link_despite(a,b,c), link_despite(a,c,b), link_despite(b,c,a)))
             except ValueError:
                 print 'Error for: %s, %s, %s' % (bacteria[i].species, bacteria[j].species, bacteria[k].species)

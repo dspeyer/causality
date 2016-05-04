@@ -39,7 +39,7 @@ for i in range(10000):
         record(sev, True)
         sev = severs(data[1], data[2], data[0])
         record(sev, False)
-    except ValueError:
+    except (ValueError,ZeroDivisionError):
         pass
         #print 'skipping %s with count %s' % (net, count(zip(*data)))
 

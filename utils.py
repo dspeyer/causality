@@ -241,11 +241,11 @@ def severs(a,b,cut):
     #print 'exp|touch b = %s' % exptouchb
     exps = [expnsev, exptoucha, exptouchb]
     bayes_factor = [1, 1, 1]
-    chi_sev = chi2_contingency(cntcut[i])
-    peg_sev = chi2.pdf(chi_sev[0],1) 
     for model in [0,1,2]:
         #print 'Model Touches %s' % (['neither', 'a', 'b'])[model]
         for i in [0,1]:
+            chi_sev = chi2_contingency(cntcut[i])
+            peg_sev = chi2.pdf(chi_sev[0],1) 
             #print ' Cut=%d' % i
             #print ' Actual: %s' % cntcut[i]
             #print ' Expected: %s' % exps[model][i]

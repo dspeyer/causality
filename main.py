@@ -64,7 +64,7 @@ for species in data.bacteria: #['Lactobacillus acidophilus']:#
     dir=direction(nod2, sick, boolvals, len(pl), p_nod2, p_cd_given_nod2)
     dirtxt=['<','>']
     if dir.reject_indep < 1e-2 and dir.bayes_fwd_rev > 2:
-        print '%s \t %s%.2e \t %.2e \t %.1f \t %.1g \t %.1g' % (species.ljust(32), dirtxt[co.sick_when_more], co.threshold, dir.reject_indep, dir.bayes_fwd_rev, dir.reject_fwd, dir.reject_rev)
+        print '%s,  %s%.2e,  %.2e,  %.1f,  %.1g,  %.1g' % (species.ljust(32), dirtxt[co.sick_when_more], co.threshold, dir.reject_indep, dir.bayes_fwd_rev, dir.reject_fwd, dir.reject_rev)
 #        print '%s \t& %s%.2e \t& %.2e \t& %.1f' % (species.ljust(32), dirtxt[co.sick_when_more], co.threshold, dir.reject_indep, dir.bayes_fwd_rev)
 #        print 'p_cd_given_n2_b = %s' % div(count(zip(sick,nod2,boolvals))[1], count(zip(nod2,boolvals)))
 #    if dir.reject_indep < 1e-2 and dir.bayes_fwd_rev < 2:
