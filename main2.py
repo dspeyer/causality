@@ -17,6 +17,8 @@ sick = data.get_data(pl, 'health', bucketizer=lambda(v):v=='ileal CD')
 
 print "patients: %d" % len(pl)
 
+icu=set()
+
 interesting=0
 bacteria=[]
 for species in data.bacteria:
@@ -33,6 +35,8 @@ for species in data.bacteria:
         boolvals.append((i>co.threshold)==(co.sick_when_more))
     if link(sick,boolvals)>.01:
         continue
+    if co.threshold!=0:
+        icu.add(species)
     bacteria.append(struct(species=species,data=boolvals))
 
 print "Total species: %d" % len(data.bacteria)
@@ -68,5 +72,7 @@ for i in range(len(bacteria)):
                                  severs(interest, sick, helper) < 1):
                                 print '%s, %s, %.1f, %s, %.1g' % (bacteria[ii].species, bacteria[hi].species, severs(helper, sick, interest),
                                                                         bacteria[oi].species, max( link(a,b), link(a,c), link(b,c), link_despite(a,b,c), link_despite(a,c,b), link_despite(b,c,a)))
+                                if bacteria[ii].species in icu:
+                                    print '^^^'
             except ValueError:
                 print 'Error for: %s, %s, %s' % (bacteria[i].species, bacteria[j].species, bacteria[k].species)

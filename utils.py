@@ -124,27 +124,63 @@ def mularr(arr, f):
 #         chi = chisquare(cntsplit[mv], exp, axis=None)
 #         print chi
 
+# def findcutoff(bact, dis):
+#     healthy=[]
+#     sick=[]
+#     for i in range(len(bact)):
+#         if dis[i]:
+#             sick.append(bact[i])
+#         else:
+#             healthy.append(bact[i])
+#     sick.sort()
+#     healthy.sort(reverse=True)
+# #    print 'sick levels %s'%sick
+# #    print 'healthy levels %s'%healthy
+#     for i in range(int((len(sick)+len(healthy))/4)):
+#         if healthy[i]<sick[i]:
+# #            print 'cutting: %d, h=%g, s=%g' % (i, healthy[i], sick[i])
+#             out=struct(threshold=(healthy[i]+sick[i])/2.0, sick_when_more=True)
+#             if healthy[i]==0:
+#                 out.threshold=0
+#             return out
+#     sick.reverse()
+#     healthy.reverse()
+#     for i in range(int((len(sick)+len(healthy))/4)):
+#         if healthy[i]>sick[i]:
+# #            print 'cutting: %d, %f, %f' % (i, healthy[i], sick[i])
+#             out=struct(threshold=(healthy[i]+sick[i])/2.0, sick_when_more=False)
+#             if sick[i]==0:
+#                 out.threshold=0
+#             return out
+#     return struct(sick_when_more=None)
+
 def findcutoff(bact, dis):
-    healthy=[]
-    sick=[]
-    for i in range(len(bact)):
-        if dis[i]:
-            sick.append(bact[i])
-        else:
-            healthy.append(bact[i])
-    sick.sort()
-    healthy.sort(reverse=True)
-#    print 'sick levels %s'%sick
-#    print 'healthy levels %s'%healthy
-    for i in range(min(len(sick),len(healthy))):
-        if healthy[i]<sick[i]:
-            return struct(threshold=(healthy[i]+sick[i])/2.0, sick_when_more=True)
-    sick.reverse()
-    healthy.reverse()
-    for i in range(min(len(sick),len(healthy))):
-        if healthy[i]>sick[i]:
-            return struct(threshold=(healthy[i]+sick[i])/2.0, sick_when_more=False)
-    return struct(sick_when_more=None)
+    ths=[0]
+    vals = sorted(bact)
+    for i in range(len(vals)-1):
+        if vals[i]!=vals[i+1]:
+            ths.append((vals[i]+vals[i+1])/2)
+    best=None
+    bestscore=-1
+    for i in ths:
+        score=0
+        for b,d in zip(bact,dis):
+            if (b>i)==d:
+                score += 1
+        swm=True
+        if score < len(bact)/2:
+            score = len(bact)-score
+            swm=False
+        if score > bestscore:
+            best = struct(threshold=i, sick_when_more=swm)
+            bestscore = score
+    return best
+
+def prettyco(co):
+    if co.threshold==0:
+        return co.sick_when_more and 'present' or 'absent'
+    dir = (co.sick_when_more and '>' or '\\leq')
+    return '$%s$%.2E' % (dir, co.threshold)
 
 def expect(val, ex, desc):
     if type(ex)==type(lambda:0):
@@ -161,8 +197,17 @@ def p_of_val(p, v):
     else:
         return 1-p
 
+def yates_chi_square(obs, exp):
+    if type(obs)==type([]):
+        sum=0
+        for o,e in zip(obs,exp):
+            sum += yates_chi_square(o,e)
+        return sum
+    return ((abs(obs-exp)-0.5)**2)/exp
+
 def direction(cause, effect, unknown, n, p_cause, p_effect_given_cause):
     cnt = count(zip(effect, unknown))
+    #print cnt
     chi_indep = chi2_contingency(cnt)[1]
     p_unknown_given_effect = [ float(cnt[0][1]) / sum(cnt[0]),
                                float(cnt[1][1]) / sum(cnt[1]) ]
@@ -176,12 +221,14 @@ def direction(cause, effect, unknown, n, p_cause, p_effect_given_cause):
                               p_of_val(p_effect_given_cause[c], e) *
                               p_of_val(p_unknown_given_effect[e], u))
     cnt = count(zip(cause, unknown))
+    #print "obs=%s" % cnt
     #print 'cnt=%s' % cnt
     #print 'expected if cd->bact=%s' % exp
     chi_rev = chisquare(cnt, exp, axis=None, ddof=2)
     chi_fwd = chi2_contingency(cnt)
     #print 'expected if bact->cd=%s' % chi_fwd[3]
     bayes_factor = chi2.pdf(chi_fwd[0],1) / chi2.pdf(chi_rev.statistic,1)
+    #print '%g = %g(%g) / % g(%g)' % (bayes_factor, chi2.pdf(chi_fwd[0],1), chi_fwd[0], chi2.pdf(chi_rev.statistic,1), chi_rev.statistic)
     return struct(reject_indep=chi_indep,
                   bayes_fwd_rev=bayes_factor,
                   reject_fwd=chi_fwd[1],
@@ -209,15 +256,16 @@ def link_despite(a,b,despite):
             ps[i]=1
     return min(ps)
 
-def severs(a,b,cut):
+def severs(a,b,cut,verbose=False):
     cntall = count(zip(a,b))
     cntcut = count(zip(cut,a,b))
     p_b_given_a = [float(x[1])/sum(x) for x in cntall]
     p_a_given_b = [float(x[1])/sum(x) for x in zip(*cntall)]
-    #print 'orig=%s' % cntall
-    #print 'split=%s' % cntcut
-    ##print 'p_a_given_b = %s' % p_a_given_b
-    ##print 'p_b_given_a = %s' % p_b_given_a
+    if verbose:
+        print 'orig=%s' % cntall
+        print 'split=%s' % cntcut
+        print 'p_a_given_b = %s' % p_a_given_b
+        print 'p_b_given_a = %s' % p_b_given_a
     pvar = count(zip(cut))
     mularr(pvar, 1.0/sum(pvar))
     expnsev = [deepcopy(cntall), deepcopy(cntall)]
@@ -237,21 +285,42 @@ def severs(a,b,cut):
             n = cntcut[i][0][bval] + cntcut[i][1][bval]
             for aval in [0,1]:
                 exptouchb[i][aval][bval] = n * p_of_val(p_a_given_b[bval], aval)
-    #print 'exp|touch a = %s' % exptoucha
-    #print 'exp|touch b = %s' % exptouchb
+    if verbose:
+        print 'exp|touch a = %s' % exptoucha
+        print 'exp|touch b = %s' % exptouchb
     exps = [expnsev, exptoucha, exptouchb]
     bayes_factor = [1, 1, 1]
     for model in [0,1,2]:
-        #print 'Model Touches %s' % (['neither', 'a', 'b'])[model]
+        if verbose:
+            print 'Model Touches %s' % (['neither', 'a', 'b'])[model]
         for i in [0,1]:
-            chi_sev = chi2_contingency(cntcut[i])
+            try:
+                chi_sev = chi2_contingency(cntcut[i])
+            except (ValueError, ZeroDivisionError) as e:
+                continue
             peg_sev = chi2.pdf(chi_sev[0],1) 
-            #print ' Cut=%d' % i
-            #print ' Actual: %s' % cntcut[i]
-            #print ' Expected: %s' % exps[model][i]
-            chi_nsev = chisquare(cntcut[i], exps[model][i], axis=None, ddof=2)
+            if verbose:
+                print ' chi_sev=%s' % str(chi_sev)
+                print ' p(e|sev)=%f' % peg_sev
+                print ' Cut=%d' % i
+                print ' Actual: %s' % cntcut[i]
+                print ' Expected: %s' % exps[model][i]
+            try:
+                chi_nsev = chisquare(cntcut[i], exps[model][i], axis=None, ddof=2)
+            except (ValueError, ZeroDivisionError) as e:
+                print 'Failure for model %d cut %d act=%s exp=%s' % (model, i, cntcut, exps[model])
+                raise e
             peg_nsev = chi2.pdf(chi_nsev[0],1)
-            #print ' Chi=%s' % str(chi_nsev)
-            #print ' p=%s' % peg_nsev
+            if verbose:
+                print ' Chi=%s' % str(chi_nsev)
+                print ' p=%s' % peg_nsev
             bayes_factor[model] *= peg_sev/peg_nsev 
     return min(bayes_factor)
+
+def any(l, cond):
+    if type(l)==type([]):
+        for i in l:
+            if any(i, cond):
+                return True
+        return False
+    return cond(l)

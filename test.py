@@ -86,3 +86,6 @@ c = [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0]*1000
 expect( severs(a,b,c), 0, 'c should not sever')
 expect( severs(a,c,b), float('inf'), 'b should sever')
 expect( severs(b,c,a), 0, 'a should not sever')
+
+expect( any([[1,2],[3,4]], lambda(x):x>5), False, 'any but none')
+expect( any([[1,2],[3,40]], lambda(x):x>5), True, 'the last one is')

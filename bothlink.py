@@ -61,17 +61,8 @@ for species in data.bacteria: #['Lactobacillus acidophilus']:#
     boolvals = []
     for i in vals:
         boolvals.append((i>co.threshold)==(co.sick_when_more))
-    dir=direction(nod2, sick, boolvals, len(pl), p_nod2, p_cd_given_nod2)
-    dirtxt=['<=','>']
-    if dir.reject_indep < 1e-2 and dir.bayes_fwd_rev > 2:
-        print '%s,  %s,  %.2e,  %.1f,  %.1g,  %.1g' % (species.ljust(32), prettyco(co), dir.reject_indep, dir.bayes_fwd_rev, dir.reject_fwd, dir.reject_rev)
-#        print '%s \t& %s%.2e \t& %.2e \t& %.1f' % (species.ljust(32), dirtxt[co.sick_when_more], co.threshold, dir.reject_indep, dir.bayes_fwd_rev)
-#        print 'p_cd_given_n2_b = %s' % div(count(zip(sick,nod2,boolvals))[1], count(zip(nod2,boolvals)))
-#    if dir.reject_indep < 1e-2 and dir.bayes_fwd_rev < 2:
-#        print 'p_b_given_cd = %s' % div(count(zip(boolvals,sick))[1], count(zip(sick)))
-        
-print 'Interesting bacterial species: %d' % interesting
-print 'Species that correlated to CD: %d' % match_disease
-
-
-
+    linkcd = chi2_contingency(count(zip(boolvals,sick)))[1]
+    linknod2 = chi2_contingency(count(zip(boolvals,nod2)))[1]
+    if linkcd<.01 and linknod2<.01:
+        print '%s: cd<%f nod2<%f sever=%f' % (species, linkcd, linknod2, severs(nod2,sick,boolvals))
+chi2_contingency(cnt)

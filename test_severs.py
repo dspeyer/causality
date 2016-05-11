@@ -32,16 +32,20 @@ for i in range(10000):
     net.c_given_ab.append((net.c_given_ab[0]+(random()*.4+.4))%1)
     net.c_given_ab = [net.c_given_ab] * 2
     data = simulate(net, 100)
+    cnt = count(zip(*data))
+#    if any(cnt, lambda(x):x<=5):
+#        continue
     try:
         sev = severs(data[0], data[1], data[2])
         record(sev, False)
+#        if sev>10:
+#            print net
         sev = severs(data[0], data[2], data[1])
         record(sev, True)
         sev = severs(data[1], data[2], data[0])
         record(sev, False)
     except (ValueError,ZeroDivisionError):
-        pass
-        #print 'skipping %s with count %s' % (net, count(zip(*data)))
+        print 'skipping %s with count %s' % (net, count(zip(*data)))
 
 for i in range(cats+1):
     print '%f: %f (%d)' % (i/float(cats), tot[i] and float(hit[i])/tot[i] or -1, tot[i])
