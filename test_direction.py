@@ -28,7 +28,7 @@ p_nod2 = 0.39
 p_cd_given_nod2=[0.48, 0.91]
 
 i=0
-for _ in range(1000):
+for _ in range(10000):
     net=struct()
     net.a = p_nod2
     p_bact = (random()*.4)+.4
@@ -55,7 +55,7 @@ print '%d fwd' % i
 #print "---"
 
 i=0
-for _ in range(1000):
+for _ in range(10000):
     net=struct()
     net.a = p_nod2
     net.b_given_a = p_cd_given_nod2
@@ -65,7 +65,7 @@ for _ in range(1000):
     #print net
     data = simulate(net, n)
     cnt = count(zip(*data))
-    print cnt
+#    print cnt
 #    if any(cnt, lambda(x):x<=5):
 #        continue
     try:

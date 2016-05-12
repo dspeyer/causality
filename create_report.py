@@ -97,9 +97,9 @@ print "Total species: %d" % len(data.bacteria)
 print "Interesting species: %d" % interesting
 print "Correlating species: %d" % len(bacteria)
 
-if False:
-  threshold = .01
-  for i in range(len(bacteria)):
+disagree=set()
+threshold = .01
+for i in range(len(bacteria)):
     for j in range(i):
         for k in range(j):
             a=bacteria[i].data
@@ -123,14 +123,20 @@ if False:
                             interest=bacteria[ii].data
                             helper=bacteria[hi].data
                             if ( severs(helper, sick, interest) > 100 and 
-                                 severs(interest, sick, helper) < 1):
-                                print '%s, %s, %s, %s, %.1f, %.1g, %.1g' % (
-                                    bacteria[ii].species, bacteria[hi].species, bacteria[oi].species, prettyco(bacteria[oi].co),
-                                    severs(helper, sick, interest),
-                                    max( link(a,b), link(a,c), link(b,c), link_despite(a,b,c), link_despite(a,c,b), link_despite(b,c,a)), dirs[bacteria[ii].species])
+                                 severs(interest, sick, helper) < 1 and
+                                 dirs[bacteria[ii].species] <= 1):
+                                disagree.add(bacteria[ii].species)
+#                                print '%s, %s, %s, %s, %.1f, %.2g, %.2g' % (
+#                                    bacteria[ii].species, bacteria[hi].species, bacteria[oi].species, prettyco(bacteria[ii].co),
+#                                    severs(helper, sick, interest),
+#                                    max( link(a,b), link(a,c), link(b,c), link_despite(a,b,c), link_despite(a,c,b), link_despite(b,c,a)), dirs[bacteria[ii].species])
                                                                             
             except ValueError:
                 print 'Error for: %s, %s, %s' % (bacteria[i].species, bacteria[j].species, bacteria[k].species)
 
 
-print severs(bv['Pseudoflavonifractor capillosus'], sick, bv['Bacteroides xylanolyticus'], verbose=True)
+print 
+print
+print len(disagree)
+
+#print severs(bv['Pseudoflavonifractor capillosus'], sick, bv['Bacteroides xylanolyticus'], verbose=True)

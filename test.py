@@ -83,9 +83,15 @@ a = [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]*1000
 b = [1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1]*1000
 c = [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0]*1000
 
-expect( severs(a,b,c), 0, 'c should not sever')
+expect( severs(a,b,c, verbose=True), 0, 'c should not sever')
 expect( severs(a,c,b), float('inf'), 'b should sever')
 expect( severs(b,c,a), 0, 'a should not sever')
 
 expect( any([[1,2],[3,4]], lambda(x):x>5), False, 'any but none')
 expect( any([[1,2],[3,40]], lambda(x):x>5), True, 'the last one is')
+
+
+expect( sumall([[1,2],[3,4]]), 10, 'sumall')
+
+for i in range(10):
+    print '%d, %f, %f, %f' % (i, chi2.pdf(i,1), chi2.cdf(i,1), blurred_chi2_pdf(i, 58))

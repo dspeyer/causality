@@ -228,7 +228,6 @@ def direction(cause, effect, unknown, n, p_cause, p_effect_given_cause):
     chi_fwd = chi2_contingency(cnt)
     #print 'expected if bact->cd=%s' % chi_fwd[3]
     bayes_factor = chi2.pdf(chi_fwd[0],1) / chi2.pdf(chi_rev.statistic,1)
-    #print '%g = %g(%g) / % g(%g)' % (bayes_factor, chi2.pdf(chi_fwd[0],1), chi_fwd[0], chi2.pdf(chi_rev.statistic,1), chi_rev.statistic)
     return struct(reject_indep=chi_indep,
                   bayes_fwd_rev=bayes_factor,
                   reject_fwd=chi_fwd[1],
@@ -255,6 +254,19 @@ def link_despite(a,b,despite):
         except ValueError:
             ps[i]=1
     return min(ps)
+
+def blurred_chi2_pdf(score, n):
+    blurred = n * (chi2.cdf(score+1.0/n, 1) - chi2.cdf(score, 1))
+    if blurred > 1e-3: # i.e. is floating point subtraction reliable?
+        return blurred
+    else:
+        return chi2.pdf(score, 1)
+
+def sumall(l):
+    if type(l)==type([]):
+        return sum([sumall(i) for i in l])
+    else:
+        return l
 
 def severs(a,b,cut,verbose=False):
     cntall = count(zip(a,b))
@@ -298,7 +310,7 @@ def severs(a,b,cut,verbose=False):
                 chi_sev = chi2_contingency(cntcut[i])
             except (ValueError, ZeroDivisionError) as e:
                 continue
-            peg_sev = chi2.pdf(chi_sev[0],1) 
+            peg_sev = blurred_chi2_pdf(chi_sev[0], sumall(cntcut[i]))
             if verbose:
                 print ' chi_sev=%s' % str(chi_sev)
                 print ' p(e|sev)=%f' % peg_sev
@@ -310,7 +322,7 @@ def severs(a,b,cut,verbose=False):
             except (ValueError, ZeroDivisionError) as e:
                 print 'Failure for model %d cut %d act=%s exp=%s' % (model, i, cntcut, exps[model])
                 raise e
-            peg_nsev = chi2.pdf(chi_nsev[0],1)
+            peg_nsev = blurred_chi2_pdf(chi_nsev[0], sumall(cntcut[i]))
             if verbose:
                 print ' Chi=%s' % str(chi_nsev)
                 print ' p=%s' % peg_nsev
