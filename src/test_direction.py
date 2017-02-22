@@ -45,7 +45,7 @@ for _ in range(10000):
 #    if any(cnt, lambda(x):x<=5):
 #        continue
     #print cnt
-    dir=direction(data[0], data[2], data[1], n, p_nod2, p_cd_given_nod2)
+    dir=direction2(data[0], data[2], data[1], n, p_nod2, p_cd_given_nod2)
     #print dir.bayes_fwd_rev
     record(dir, True)
     i += 1
@@ -69,7 +69,7 @@ for _ in range(10000):
 #    if any(cnt, lambda(x):x<=5):
 #        continue
     try:
-        dir=direction(data[0], data[1], data[2], n, p_nod2, p_cd_given_nod2)
+        dir=direction2(data[0], data[1], data[2], n, p_nod2, p_cd_given_nod2)
         #print dir.bayes_fwd_rev
         record(dir, False)
         i += 1
