@@ -10,7 +10,7 @@ from sys import stdout
 from random import random
 from simulate_causal_net import simulate
 from collections import defaultdict
-from direction import mle as direction
+from direction import montecarlo as direction
 
 tot=defaultdict(lambda:0)
 hit=defaultdict(lambda:0)

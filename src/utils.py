@@ -109,6 +109,21 @@ def mularr(arr, f):
         else:
             arr[i]*=f
 
+def sumarr(arr, f):
+    for i in range(len(arr)):
+        if type(arr[i])==type([]):
+            sumarr(arr[i],f)
+        else:
+            arr[i]+=f
+
+def acclarr(a, b):
+    for i in range(len(a)):
+        if type(a[i])==type([]):
+            acclarr(a[i],b[i])
+        else:
+            a[i]+=b[i]
+
+            
 # def severs(a, b, mid):
 #     cntall=count(zip(a,b), [2,2])
 #     cntsplit=count(zip(mid,a,b), [2,2,2])
