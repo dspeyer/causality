@@ -3,7 +3,7 @@
 from copy import copy
 from copy import deepcopy
 from collections import defaultdict
-from math import log
+from math import log, exp
 from scipy.stats import chisquare
 from scipy.stats import chi2_contingency
 from scipy.stats import chi2
@@ -109,6 +109,21 @@ def mularr(arr, f):
         else:
             arr[i]*=f
 
+def sumarr(arr, f):
+    for i in range(len(arr)):
+        if type(arr[i])==type([]):
+            sumarr(arr[i],f)
+        else:
+            arr[i]+=f
+
+def acclarr(a, b):
+    for i in range(len(a)):
+        if type(a[i])==type([]):
+            acclarr(a[i],b[i])
+        else:
+            a[i]+=b[i]
+
+            
 # def severs(a, b, mid):
 #     cntall=count(zip(a,b), [2,2])
 #     cntsplit=count(zip(mid,a,b), [2,2,2])
@@ -204,34 +219,6 @@ def yates_chi_square(obs, exp):
             sum += yates_chi_square(o,e)
         return sum
     return ((abs(obs-exp)-0.5)**2)/exp
-
-def direction(cause, effect, unknown, n, p_cause, p_effect_given_cause):
-    cnt = count(zip(effect, unknown))
-    #print cnt
-    chi_indep = chi2_contingency(cnt)[1]
-    p_unknown_given_effect = [ float(cnt[0][1]) / sum(cnt[0]),
-                               float(cnt[1][1]) / sum(cnt[1]) ]
-    #print 'p(bact|cd)=%s' % p_unknown_given_effect
-    exp=[[0,0],[0,0]]
-    for c in range(2):
-        for e in range(2):
-            for u in range(2):
-                exp[c][u] += (n * 
-                              p_of_val(p_cause, c) *
-                              p_of_val(p_effect_given_cause[c], e) *
-                              p_of_val(p_unknown_given_effect[e], u))
-    cnt = count(zip(cause, unknown))
-    #print "obs=%s" % cnt
-    #print 'cnt=%s' % cnt
-    #print 'expected if cd->bact=%s' % exp
-    chi_rev = chisquare(cnt, exp, axis=None, ddof=2)
-    chi_fwd = chi2_contingency(cnt)
-    #print 'expected if bact->cd=%s' % chi_fwd[3]
-    bayes_factor = chi2.pdf(chi_fwd[0],1) / chi2.pdf(chi_rev.statistic,1)
-    return struct(reject_indep=chi_indep,
-                  bayes_fwd_rev=bayes_factor,
-                  reject_fwd=chi_fwd[1],
-                  reject_rev=chi_rev.pvalue)
 
 
 def div(a, b):
