@@ -26,9 +26,9 @@ The literature abounds with correlational studies matching diseases to
 gut microbiome dysbiosis, but medical practice does not abound with
 corresponding probiotic therapies.  One critical missing piece is
 causality.  If the dysbiosis is a \textit{result} of the disease,
-then there is no point in correcting the dysbiosis.  In this paper we
-present three statistical techniques for determining causality from
-existing data and apply them to Crohn's Disease.  The first technique
+then there is no point in correcting the dysbiosis.  This paper 
+presents three statistical techniques for determining causality from
+existing data and applies them to Crohn's Disease.  The first technique
 is to find bacteria which are the mechanism by which a gene causes the
 disease.  The second is to find bacteria that correlate to the
 disease, but not to that gene.  The final technique is to look for a
@@ -39,7 +39,7 @@ dependences and independences.
 \begin{figure*}[t]
   \includegraphics[width=\textwidth]{bayesball}
   \caption{The ``Bayes Ball'' rule: how mutual information travels and
-  does not travel through a causal graph, as illustrated by Pan and
+  does not travel through a causal graph, illustrated by Pan and
   Xu\cite{bayesball} }
 \end{figure*}
 
@@ -47,7 +47,7 @@ dependences and independences.
 
 A great many diseases correlate with disruptions in the gut microbiome
 (known as “dysbiosis”).  In addition to Crohn's Disease, these include
-Metabolic Syndrome, Diabetes (both types)\cite{obesity} , Asthma, Multiple
+Metabolic Syndrome, both types of Diabetes \cite{obesity}, Asthma, Multiple
 Sclerosis\cite{autoim}, Depression and Autism\cite{cns}.  All of these diseases are
 increasing in prevalence, have no clearly established cause, and are
 difficult to cure.
@@ -75,7 +75,7 @@ explanation for how the species were chosen.  Performing large RCTs
 for all plausible bacterial species and cocktails is not practical.
 
 
-Our goal in this paper will be to find bacteria that are likely to
+The goal of this paper is to find bacteria that are likely to
 cure or prevent Crohn's Disease without an RCT.  Why Crohn's Disease?
 As an autoimmune disorder of the intestine, it is particularly likely
 to be caused by gut dysbiosis.  Also, while it is neither as common as
@@ -86,8 +86,8 @@ quality of life impact of 0.88 during remission and 0.74 during
 flare\cite{qol}.  Finally, it is a well-studied disease, with plentiful data
 available through NCBI.
 
-To establish causality, we will make use of the ``Bayes ball'' rule.
-Specifically, two variables will correlate if and only if you can
+The key to establishing causality is the ``Bayes ball'' rule.
+That is, two variables will correlate if and only if you can
 trace a path between them through a causal graph changing direction
 only at causes that are not controlled for or at effects which are,
 and passing through things that are not (illustrated in figure 1).  This
@@ -95,7 +95,9 @@ principle is widely used in machine learning, specifically applying
 bayesian models.  It can also be used in reverse to take correlational
 data and find aspects of the underlying causal graph.\cite{causal}
 
-
+Also relevant: NOD2 is a gene expressed in leukocytes (where it helps
+them recognize bacterial peptidoglycans),
+mutations in which are known\cite{data} to correlate with Crohn's Disease.
 
 \section{Methods}
 
@@ -105,34 +107,33 @@ converted  to species names using BLAST and NCBI's
 16S database.  For reads with multiple matches, the highest
 scoring were taken.  Reads with no matches were simply dropped.  
 The number of reads for each patient and each species were counted, and divided
-by the total number of reads for that patient.  Uninteresting bacteria
+by the total number of reads for that patient.  Uninteresting species
 were filtered out
 by bucketing into powers of 10 and dropping
-anything with an entropy below 0.5, on the logic that a bacterium that
+any with an entropy below 0.5, on the logic that a bacterium that
 didn't vary much between patients couldn't have interesting effects.
 
 The read fractions were converted to boolean values by comparing them to
 per-species thresholds.  For each species, a threshold was chosen that
 maximized the number of Crohn's Disease statuses that could be
-correctly predicted by that bacteria alone.  These boolean values can
+correctly predicted by that bacterium alone.  These boolean values can
 then be thought of as ``has a clinically relevant dosage of the
 bacterium''.
 
 Similarly, Crohn's status was converted to a boolean by accepting only
-Ileal Disease and Control, dropping all others.  I tried combining
-Ileal CD and Colitis, but this produced nonsensical results.  For
+Ileal Disease and Control, dropping all others.  Grouping
+Ileal CD and Colitis together was attempted, but produced nonsensical results.  For
 NOD2, both mutant forms were merged into one category.  This produced exclusively
-boolean variables, which made analysis considerably easier.
+boolean variables, which made analysis considerably simpler.
 
 \subsection{The Intermediation Technique}
 
-NOD2 is a gene, mutations in which are known\cite{data} to correlate with
-Crohn's Disease.  It has been speculated that this effect is
-intermediated by gut bacteria.  The first approach is to search for
+It has been speculated that the effect of NOD2 on ICD is
+intermediated by gut bacteria.  One approach is to search for
 those bacteria.
 
-First. species that are linked to both NOD2 and ICD were sought.
-Then  those species were controlling for and it was checked whether
+First, species that are linked to both NOD2 and ICD were found.
+Then each of those species were controlled for and it was checked whether
 this  made NOD2 and
 ICD independent.  That should happen if and only if the species
 intermediates.
@@ -152,7 +153,7 @@ same, but
 the same the other way around.  Likelihood values are then computed for
 all four models using a $\chi^2$ pdf.  For each model,  the
 'bacterium present' and 'bacterium absent' cases are multiplied.  Finally, the
-likelihood score for the 'independent' model are divided by the highest of the
+likelihood score for the 'independent' model is divided by the highest of the
 competing scores to get a bayes factor.
 
 \subsection{The Gene/Bacterium Technique}
@@ -168,17 +169,18 @@ the mechanisms that control genes are well understood, it is safe to assume
 that the gene causes the disease.  This can be combined with the two simplest
 cases for the bacterium: that it causes the disease or is
 caused by it, to get known three-node graphs with consequences for the
-NOD2/bacteria relationship.  If the bacteria causes the disease, they
+NOD2/bacteria relationship.  If the bacterium causes the disease, it
 should be independent from
 NOD2, but if the reverse, there should be a specific level of dependence.
 
-The probabilities $p(NOD2)$, $p(ICD|NOD2)$ and
-$p(bacterium|ICD)$ can be easily computed, and from these and the
-model $p(bacterium|NOD2)$ can be predicted.  
-The observed NOD2/bacterium relationship was then compared to each prediction
+Probabilities $p(NOD2)$, $p(ICD|NOD2)$ and
+$p(B|ICD)$ can be easily computed.  Combining these probabilities with
+the model, $p(B|NOD2)$ can be predicted.  
+The observed NOD2/ bacterium relationship was then compared to this
+prediction and to independence
 using a $\chi^2$ test.  The dataset was too small to
-reject either hypothesis, but it was possible to use the pdf of the distribution
-to produce an odds ratio.  Since neither hypothesis is ``null'' in the
+reject either hypothesis, so the pdf of the distribution was used 
+to produce a bayes factor.  Since neither hypothesis is ``null'' in the
 classical sense, this is useful.  This paper shall refer to this test as a
 ``direction'' test, and it is illustrated in figure 2.
 
@@ -215,8 +217,8 @@ generated, then used to produce
 datasets equal in size to those used here. The tests were then run on
 appropriate combinations of nodes.  The bayes factors were converted to
 posteriors using precisely correct priors.  The posteriors were bucketed in 5\%
-units and the fraction of runs in each bucket correctly
-described the causal net was counted.
+units and the fraction of runs in each bucket which correctly
+described their respective causal net was counted.
 
 \section{Results}
 
@@ -227,7 +229,8 @@ these, there were 2648 species of bacteria, of which 675 had sufficient
 entropy to be interesting and 107 linked to Crohn's Disease at
 $p<0.01$.
 
-The NOD2/Crohn's Disease link was confirmed at $p<0.0023$.
+The NOD2/ICD link was confirmed at
+$p<0.0023$.  No link was found between NOD2 and Colitis.
 
 \subsection{The Intermediation Technique}
 
@@ -285,8 +288,6 @@ formicigenerans &  435.4 & 6.7E-4 & 8.2 \\
 \cline{3-6}
 & & D. formicigenerans & S. termitidis &  173.7 & 1.5E-4 &  \\
 \cline{3-6}
-& & D. formicigenerans & P. capillosus &  173.7 & 7.4E-3 &  \\
-\cline{1-7}
 Clostridium methylpentosum & $\leq$9.09E-04 &C. minuta & C. hongkongensis &  431.5 & 4.1E-3 & 110 \\
 \cline{1-7}
 Coprococcus catus & $\leq$9.02E-04 & P. cinnamivorans & B. cellulosolvens &  117422.9 & 1.4E-3 & 3.4 \\
@@ -311,10 +312,10 @@ Ruminococcus faecis & $\leq$1.07E-03 & P. capillosus & E. siraeum &  516.6 & 1.4
     p-values are $\leq$ this value).}
 \end{figure*}
 
-The three bacterium technique found 3 of the same species as the
+The Three Bacterium Technique found 3 of the same species as the
 gene/bacterium, plus 2 with direction scores between 1 and 10
 (i.e. suggestive of causality, but too weak to report on the previous
-table).  These species were shown via 1 to 4 helper species each.
+table).  These species were shown via 1 to 3 helper species each.
 This technique also found 21 species whose Gene/ Bacterium direction
 scores were less than 1.  Since the direction test is highly reliable
 in that range, those are not shown.  The 5 confirmed species are shown
@@ -327,8 +328,8 @@ Calibration of the direction and severing tests are shown in figure
 5.  Both techniques are systematically overconfident, but they stay
 fairly close to the
 correctly-calibrated line.  While the direction test does better
-overall, it is least reliable precisely where we need it most.  The
-severing test is less reliable overall, but is robust about when
+overall, it is least reliable precisely where it is needed most.  The
+severing test is less reliable overall, but is robust when
 returning values as strong as are reported here.
 
 \section{Discussion}
@@ -358,12 +359,12 @@ disease.
 \subsection{Calibration}
 
 The consistent biases of the Direction and Severing tests are
-especially worrying.  The reason for this is not clear.  It may be
+especially worrying.  The reason for them is not clear.  It may be
 that dividing PDFs is not similar enough to dividing probabilities.
 The difference would be largest with $\chi^2$ scores close to 0, where
 the distribution's PDF is steepest, and this would explain why the
-direction test fails where it does, though an attempt to smooth the
-direction test like the severing test did not improve calibration.
+Direction test fails where it does, though an attempt to smooth the
+Direction test like the severing test did not improve calibration.
 Alternatively, it may also be that the $\chi^2$ distribution is not a
 good enough approximation to the actual likelihood of $\chi^2$ scores
 when samples are small.  This could be solved by larger data sizes.
@@ -394,7 +395,7 @@ which bacteria are in the intestine, but where in the intestine they
 are.
 
 Sphingopyxis alaskensis and Roseiflexus castenholzii are extremely surprising, being marine
-bacteria that are not known to colonize intestines at all.  It seems
+bacteria (arctic ocean and freshwater respectively) that are not known to colonize intestines at all.  It seems
 likely that some other species is being mis-identified -- possibly a
 related species, or possibly a species that contaminated the reference
 panel that formed NCBI's 16S database.  This casts some doubt on all
@@ -403,7 +404,7 @@ least, have more robust data.
 
 \subsection{Causal Graph Assumptions}
 
-Throughout this, I have made two simplifying assumptions.  The first
+Throughout this, there have been two simplifying assumptions.  The first
 is that the causal graph is simply connected.  This is not likely to
 be entirely true, but for any given set of nodes, the simply connected
 explanation is the most parsimonious.  This may seem strange from a
@@ -417,7 +418,7 @@ a circle, and one is influenced by Crohn's Disease, this will pass the
 Three Bacterium test.  This may explain the bacteria that passed that
 test while emphatically failing the Gene/Bacterium test.
 
-Also, I have assumed there are no interesting selection effects.  If
+Also, it is assumed there are no interesting selection effects.  If
 there were a bacterium that influenced behavior to make healthy people
 more likely to volunteer for control groups of observational studies,
 both the Gene/Bacterium and Three Bacterium tests would find that it
@@ -442,41 +443,54 @@ Nevertheless, I have demonstrated that they can be used on real-world
 data, and that the results are plausible.  They may apply to other
 diseases.
 
-All code is available on https://github.com/dspeyer/causality/
+All code is available on https://github.com/dspeyer/causality
 
 \begin{thebibliography}{11}
-\bibitem{obesity} Tilg \& Kaser ``Gut microbiome, obesity, and metabolic
-  dysfunction'' Journal of Clinical Investigation. 2011
-\bibitem{autoim} Fung, Garrett, Shahane \& Kwan ``Do Bugs Control Our
-  Fate? The Influence of the Microbiome on Autoimmunity'' Curr Allergy
-  Asthma Rep. 2012
-\bibitem{cns} Wang \& Casper ``The role of microbiome in central
-  nervous system disorders'' Brain, Behavior, and Immunity. 2014
-\bibitem{rctob} Kadooka et. al. ``Effect of Lactobacillus gasseri SBT2055
+\bibitem{obesity} H. Tilg \& A. Kaser ``Gut microbiome, obesity, and metabolic
+  dysfunction'' \textit{Journal of Clinical Investigation}, 121(6):2126–2132, 2011 
+\bibitem{autoim} I Fung, JP Garrett, A Shahane \& M Kwan ``Do Bugs Control Our
+  Fate? The Influence of the Microbiome on Autoimmunity'' \textit{Curr Allergy
+  Asthma Rep}, Dec;12(6):511-9, 2012
+\bibitem{cns} Y Wang \& LH Casper ``The role of microbiome in central
+  nervous system disorders'' \textit{Brain, Behavior, and Immunity}, 38:1-12, 2014
+\bibitem{rctob} Y Kadooka,  M Sato,  A Ogawa,  M Miyoshi,  H Uenishi,
+  H Ogawa, K Ikuyama, M Kagoshima  \& T Tsuchida  ``Effect of Lactobacillus gasseri SBT2055
   in fermented milk on abdominal adiposity in adults in a randomised
-  controlled trial.'' British Journal of Nutrition, 110, pp
-  1696-1703. 2013
-\bibitem{rctma} Prantera, C. ``Probiotics for Crohn’s Disease: What
-  Have We Learned?'' Gut 55.6 (2006): 757–759. PMC. Web. 15 Feb. 2016.
+  controlled trial.'' \textit{British Journal of Nutrition}, 110(9):1696-1703, 2013
+\bibitem{rctma} C Prantera ``Probiotics for Crohn’s Disease: What
+  Have We Learned?'' \textit{Gut} 55.6(2006):757–759, 2016
 \bibitem{mort} Loftus ``Crohn’s disease: why the disparity in
-  mortality?'' Gut 2006
-\bibitem{qol}  Gregor et al. ``An evaluation of utility measurement in Crohn's disease'' Inflamm Bowel Dis. 1997
+  mortality?'' \textit{Gut}, 55(4):447-9, 2006
+\bibitem{qol}  JC Gregor,  JW McDonald,  N Klar,  R Wall,  K Atkinson,
+ B  Lamba \& BG Feagan  ``An evaluation of utility measurement in
+ Crohn's disease'' \textit{Inflamm Bowel Dis}, 3(4):265-76, 1997
 \bibitem{bayesball} Pan \& Xu ``Introduction to Probabilistic
   Graphical Models'' Zhejiang University. 2006
-\bibitem{causal} Pearl, J. ``Causal Inference in Statistics: An
-  Overview'' Statistical Surveys Vol 3 96-146. 2009
-\bibitem{data} Li, Frank \& Sartor, ``Effect of Crohn’s Disease Risk
-  Alleles on Enteric Microbiota'' Encyclopedia of Metagenomics. 2014
-\bibitem{erect} Joan Vermeiren, Pieter Van den Abbeele, Debby Laukens,
-  Louise Kristine Vigsnæs, Martine De Vos, Nico Boon \& Tom Van de
+\bibitem{causal} J Pearl ``Causal Inference in Statistics: An
+  Overview'' \textit{Statistical Surveys} Vol 3 96-146. 2009
+\bibitem{data} E Li, D Frank \& R Sartor, ``Effect of Crohn’s Disease Risk
+  Alleles on Enteric Microbiota'' \textit{Encyclopedia of
+    Metagenomics},  1-5, 2014
+\bibitem{erect} J Vermeiren, P Abbeele, D Laukens,
+  L Vigsnæs, M Vos, N Boon \& T
   Wiele ``Decreased colonization of fecal Clostridium
   coccoides/Eubacterium rectale species from ulcerative colitis
-  patients in an in vitro dynamic gut model with mucin environment'' FEMS Microbiology Ecology Mar 2012
-\bibitem{lgg1} Prantera C, Scribano M L, Falasco G. et al ``Ineffectiveness of probiotics in preventing recurrenece after curative resection for Crohn's disease: a randomised controlled trial with Lactobacillus GG.'' Gut 200251405–409.409
-\bibitem{lgg2} Bousvaros A, Guendalini S, Baldassano R N. et al ``A randomized, double blind trial of Lactobacillus GG versus placebo in addition to standard maintenance therapy for children with Crohn's disease.'' Inflamm Bowel Dis 200511833–839.839
-\bibitem{lacid} Jens Walter ``Ecological Role of Lactobacilli in the
+  patients in an in vitro dynamic gut model with mucin environment''
+  \textit{FEMS Microbiology Ecology},  79(3):685-96, Mar 2012
+\bibitem{lgg1} C Prantera, M Scribano, G Falasco, A Andreoli, C Luzi
+  ``Ineffectiveness of probiotics in preventing recurrenece after
+  curative resection for Crohn's disease: a randomised controlled
+  trial with Lactobacillus GG.'' \textit{Gut}  200251405–409.409, 2002
+\bibitem{lgg2} A Bousvaros,  S Guendalini,  R Baldassano, C Botelho,
+  J Evans,  G Ferry,  B Goldin,  L Hartigan,  S Kugathasan,  J Levy,
+  K Murray,  M Oliva-Hemker,  J Rosh, V Tolia,  A Zholudev,  J
+  Vanderhoof \&  P Hibberd ``A randomized, double blind trial of
+  Lactobacillus GG versus placebo in addition to standard maintenance
+  therapy for children with Crohn's disease.'' \textit{Inflamm Bowel
+    Dis} 200511833–839.839, 2005
+\bibitem{lacid} J Walter ``Ecological Role of Lactobacilli in the
   Gastrointestinal Tract: Implications for Fundamental and Biomedical
-  Research'' Appl. Environ. Microbiol. August 2008
+  Research'' \textit{Appl. Environ. Microbiol.} 74(16):4985–4996, August 2008
 
     
 
