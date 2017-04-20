@@ -32,7 +32,8 @@ i=0
 for _ in range(10000):
     net=struct()
     net.a = p_nod2
-    p_bact = (random()*.4)+.4
+    #    p_bact = (random()*.4)+.4
+    p_bact = random()
     net.b_given_a=[p_bact, p_bact]
     net.c_given_ab=[[0,0],[0,0]]
     while min(net.c_given_ab[0][1],net.c_given_ab[1][1])<=0 or max(net.c_given_ab[0][1],net.c_given_ab[1][1])>=1:
@@ -60,8 +61,9 @@ for _ in range(10000):
     net=struct()
     net.a = p_nod2
     net.b_given_a = p_cd_given_nod2
-    net.c_given_ab=[random(), 0]
-    net.c_given_ab[1] = (net.c_given_ab[0] + (random()*.4+.4)) % 1
+    net.c_given_ab=[random(), random()]
+#    net.c_given_ab=[random(), 0]
+#    net.c_given_ab[1] = (net.c_given_ab[0] + (random()*.4+.4)) % 1
     net.c_given_ab = [net.c_given_ab]*2
     #print net
     data = simulate(net, n)

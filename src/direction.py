@@ -81,6 +81,8 @@ def montecarlo(cause, effect, unknown, n, *ignore):
     cnt_cause_effect = count(zip(cause, effect))
     cnt_effect_unknown = count(zip(effect, unknown))
     sumarr(cnt_cause_effect, 0.1) # make beta dist work with zeros
+    sumarr(cnt_cause, 0.1)
+    sumarr(cnt_unknown, 0.1)
     sumarr(cnt_effect_unknown, 0.1)
     cnt_cause_unknown = count(zip(cause, unknown))
     rounds = 100
