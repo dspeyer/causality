@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from datareader import Data
-from utils import *
 from scipy.stats import chi2_contingency
 from scipy.stats import chi2
 from scipy.stats import chisquare
@@ -10,6 +9,8 @@ from sys import stdout
 from random import random
 from simulate_causal_net import simulate
 from collections import defaultdict
+from severs import conditional as severs
+from utils import struct, count, any
 
 tot=defaultdict(lambda:0)
 hit=defaultdict(lambda:0)
@@ -23,7 +24,7 @@ def record(sev, truth):
     if truth:
         hit[rpost] += 1
 
-for i in range(10000):
+for i in range(10):
     net=struct()
     net.a = (random()*.4)+.4
     net.b_given_a=[random()*.6+.2]
@@ -33,13 +34,15 @@ for i in range(10000):
     net.c_given_ab = [net.c_given_ab] * 2
     data = simulate(net, 100)
     cnt = count(zip(*data))
-#    if any(cnt, lambda(x):x<=5):
-#        continue
+    if any(cnt, lambda(x):x==0):
+        continue
     try:
+        print "--- %s ---" % net
         sev = severs(data[0], data[1], data[2])
         record(sev, False)
-#        if sev>10:
-#            print net
+        #        if sev>10:
+        #            print net
+        print "Severs:"
         sev = severs(data[0], data[2], data[1])
         record(sev, True)
         sev = severs(data[1], data[2], data[0])

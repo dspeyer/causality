@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[twocolumn,12pt]{article}
 \usepackage{tikz}
 \usetikzlibrary{calc}
 \newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
@@ -8,7 +8,128 @@
   \end{tikzpicture}
 }  
 \newcommand{\Ex}{\mathbb{E}}
+\usepackage{graphicx}
+\usepackage{dblfloatfix}
+\usepackage[superscript,biblabel]{cite}
+\usepackage{multirow,tabularx}
+\usepackage{hhline}
+
+\newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+\title{Inferring Causality from Finite Data using Conditional Independence}
+\author{Daniel Speyer}
+%\address{dls2192@columbia.edu}
 \begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Inferring causal graphs from observational data is a widely-sought
+goal in statistics.  The most common tool for it is conditional
+independence.  The specifics of a causal graph determine which node
+are independent conditioned on which others by the ``bayes ball''
+rule, and therefore it should be possible to observe the independences
+and work backward to the causal graph.
+
+This has proved to be more difficult in practice.  In particular,
+observing independence is not as simple as it sounds.  Pearl suggests
+we test joint conditional probability distributions for equality.
+Leaving aside the curse of dimensionality, this assumes we have the
+exact distributions.  If all we have is a finite random sample from
+those distributions, we can construct posteriors, but we cannot perform
+an equality test.  [Someone] encourages us to ``assume our statistical
+tools for testing independence are adequate'', while admitting they
+likely are not.  [Someone] describes this as ``possessing an
+independence oracle''.  Many simply include a ``test if $a\indep
+b|s$'' step in their algorithms, assuming the reader will already know
+how.
+
+In practice, the usual solution is to treat independence as a null
+hypothesis, try to reject it at some p threshold, and treat any
+failure as establishing it.  Needless to say, this is incorrect.
+
+Dealing with finite data means the possibility of dealing with too
+little data.  The elegant solution is to give some numerical
+expression of confidence which becomes ``I don't know'' when the data
+gets too small.  This solution has another benefit: in the biomedical
+context, it is routine to test thousands of equally plausible
+hypotheses at once.  A flat accuracy of 99\% is unhelpful in the face
+of this, but a numeric expression of confidence allows proper
+compensation.
+
+\subsection{Inspiring Problem: Crohn's Disease}
+
+This paper is optimized around a specific practical problem:
+untangling the microbiome's role in Illial Crohn's Disease.  It is
+well established that there are many differences in the intestinal
+bacteria of healthy people and of people with the disease, but it is
+not established whether the differences of bacteria \textit{cause} the
+disease.  If we can find a set of bacteria such that
+p(disease|do(bacteria)) is low, we will have a cure for the disease.
+There have been attempts to determine this by randomized controlled
+trial, but the number of species, combined with other relevant
+variables, make exhaustive RCTs impractical.
+
+Data is available on this problem, including genetic, microbiome and
+health information, but for only 58 patients.  The microbiome
+information is a series of 16S reads, but can generally be described
+as ``present'' or ``absent'', with very low concentrations of a
+species rounded off to ``absent''.  This comes much closer to fitting
+the empirical distributions than any convenient scalar formula (see
+figure 1) which is why this paper will use binary variables.
+
+\section{Extending Graphs}
+
+Let us begin with the simplest case.  Suppose we have a known cause, a
+known effect, and a variable which connects to the effect in an
+unknown way, that is $A \rightarrow B$ -- $C$.  We do not observe a
+correlation between $A$ and $C$, but that might only mean our test is
+underpowered.  For Crohn's Disease, $A$ would be mutations in the NOD2
+gene, $B$ would be the disease, and $C$ would be each of [number]
+species of bacteria.
+
+For now, we will assume that there is no direct causal
+link between $A$ and $C$, and furthermore that there are no unobserved
+confounders or selection effects.  We will consider these later.
+This leaves us only two models, $A \rightarrow B \rightarrow C$ or $A
+\rightarrow B \leftarrow C$.  We can call these ``chain'' and
+``collide'' models.  Can we distinguish between them?
+
+Yes.  Let us consider
+$p(A,C)$:
+
+\begin{eqnarray}
+p(A,C|chain) & = & \sum_B p(A)p(B|A)p(C|B) \\
+p(A,C|collide) & = & p(A)p(C)
+\end{eqnarray}
+
+We do not actually know the terms on the right side of those
+equations, so let us parameterize both models with $\theta$ and
+rewrite the equations as:
+
+\begin{eqnarray}
+  p(A,C|chain) & = & \int \left ( 
+  \sum_B p(A|\theta)p(B|A,\theta)p(C|B,\theta)
+  \right ) p(\theta) d\theta \\
+  p(A,C|collide) & = & \int p(A|\theta)p(C|\theta)p(\theta) d\theta
+\end{eqnarray}
+
+We can learn $p(\theta)$ from available data using dirichlet priors.
+The integrals would be difficult algebraically, but they can be
+adequately approximated with monte-carlo sampling.
+
+Once we have these, let $n_{a,c}$ be the count of datapoints with
+A=a,C=c and we can use:
+
+\begin{equation}
+p(n_*|model) = \prod_{a,c} p(a,c|model)^{n_{a,c}}
+\end{equation}
+
+From here, we can apply standard bayesian updating.  Empirically, this
+works well, in a test of 10k runs of each model with random parameters
+(see figure).
 
 \subsection{Non-Simply-Connected Graphs}
 
@@ -29,11 +150,5 @@ albeit underconfidently.  If the direct influence is too strong, we
 will see a correlation between $A$ and $C$.  And if the direct
 influence is in the same direction as the indirect, the correct model
 will remain the better fit (though both models will be worse).
-
-
-\begin{eqnarray*}
-\prod_{a,c} p(a,c|m_{co})^{\Ex n_{a,c}} & > & \prod_{a,c} p(a,c|m_{ch})^{\Ex n_{a,c}} \\
-\sum_{a,c} \log(p(a,c|m_{co}))\Ex n_{a,c} & > & \sum_{a,c} \log(p(a,c|m_{ch}))\Ex n_{a,c} \\
-
 
 \end{document}

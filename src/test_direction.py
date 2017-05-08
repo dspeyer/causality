@@ -29,10 +29,12 @@ p_nod2 = 0.39
 p_cd_given_nod2=[0.48, 0.91]
 
 mode=argv[1][1:]
-if mode not in ['platonic', 'crohns', 'multi']:
+if mode not in ['platonic', 'crohns', 'multi', 'multiplat']:
     print "Bad Mode"
     exit(1)
 runs=int(argv[2])
+if len(argv)>3:
+    n=int(argv[3])
 
 
 i=0
@@ -43,12 +45,12 @@ while i < runs:
         print 'try #%d / run #%d ' % (tries, i)
     net=struct()
 
-    if mode=='platonic':
+    if mode in ['platonic', 'multiplat']:
         net.a = random()
     else:
         net.a = p_nod2
 
-    if mode=='platonic':
+    if mode in ['platonic', 'multiplat']:
         p_bact = random()
     else:
         p_bact = (random()*.4)+.4
