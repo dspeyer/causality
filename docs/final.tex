@@ -1,0 +1,39 @@
+\documentclass{article}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
+\newcommand{\underarrow}[2] {
+  \begin{tikzpicture}[overlay,remember picture,out=340,in=210,distance=0.3cm]
+    \draw [->,shorten >=3pt,shorten <=-3pt] ({#1}.south) to ({#2}.west);
+  \end{tikzpicture}
+}  
+\newcommand{\Ex}{\mathbb{E}}
+\begin{document}
+
+\subsection{Non-Simply-Connected Graphs}
+
+What if there is a causal effect $A\rightarrow C$?  It must be weak
+enough not to be detected, but that doesn't say much.  Let us consider
+it by cases.
+
+\subsubsection{False Colliders}
+
+Can a true graph of
+$A\tikzmark{a}\rightarrow B \rightarrow{C}\tikzmark{c}$
+\underarrow{a}{c}
+produce a $p(A,C)$ more similar to a graph
+$A \rightarrow B \leftarrow C$?  This would require the direct and
+indirect influence of $A$ on $C$ to cancel out rather precisely.  If
+the indirect influence is stronger, we will pick the correct model,
+albeit underconfidently.  If the direct influence is too strong, we
+will see a correlation between $A$ and $C$.  And if the direct
+influence is in the same direction as the indirect, the correct model
+will remain the better fit (though both models will be worse).
+
+
+\begin{eqnarray*}
+\prod_{a,c} p(a,c|m_{co})^{\Ex n_{a,c}} & > & \prod_{a,c} p(a,c|m_{ch})^{\Ex n_{a,c}} \\
+\sum_{a,c} \log(p(a,c|m_{co}))\Ex n_{a,c} & > & \sum_{a,c} \log(p(a,c|m_{ch}))\Ex n_{a,c} \\
+
+
+\end{document}
