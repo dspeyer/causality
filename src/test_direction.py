@@ -36,6 +36,10 @@ runs=int(argv[2])
 if len(argv)>3:
     n=int(argv[3])
 
+if mode=='multiplat':
+    n=1000
+
+### Collider
 
 i=0
 tries=0
@@ -60,10 +64,11 @@ while i < runs:
         net.b_given_a=[p_bact, p_bact + random()*0.2 - 0.1]
 
     net.c_given_ab=[[0,0],[0,0]]
-    if mode=='platonic':
-        for a in range(2):
-            for b in range(2):
-                net.c_given_ab[a][b]=random()
+    if mode in ['platonic', 'multiplat']:
+        for b in range(2):
+            r=random()
+            for a in range(2):
+                net.c_given_ab[a][b]=r
     else:
         while min(net.c_given_ab[0][1],net.c_given_ab[1][1])<=0 or max(net.c_given_ab[0][1],net.c_given_ab[1][1])>=1:
             net.c_given_ab[0][0] = random()
@@ -73,13 +78,19 @@ while i < runs:
 
     data = simulate(net, n)
 
-    if mode!='platonic':
+    if mode not in ['platonic', 'multiplat']:
         cnt = count(zip(*data))
         if any(cnt, lambda(x):x==0):
             continue
         if chi2_contingency(count(zip(data[0],data[2])))[1]>.01:
             continue
         if mode=='multi' and chi2_contingency(count(zip(data[0],data[1])))[1]<.1:
+            continue
+    elif mode=='multiplat':
+        cnt = count(zip(*data))
+        if any(cnt, lambda(x):x==0):
+            continue
+        if chi2_contingency(count(zip(data[0],data[1])))[1] < chi2_contingency(count(zip(data[0],data[2])))[1]:
             continue
 
     dir=direction(data[0], data[2], data[1], n, p_nod2, p_cd_given_nod2)
@@ -88,33 +99,44 @@ while i < runs:
 
 print '%d fwd (took %d tries)' % (i, tries)
 
+if mode=='multiplat':
+    for i in range(cats+1):
+        print '%f: %f (%d)' % (i/float(cats), tot[i] and float(hit[i])/tot[i], tot[i])
+    tot=defaultdict(lambda:0)
+    hit=defaultdict(lambda:0)
+
+
+### Chain
+
 i=0
 tries=0
 while i < runs:
     net=struct()
     tries += 1
 
-    if mode=='platonic':
+    if mode in ['platonic', 'multiplat']:
         net.a = random()
     else:
         net.a = p_nod2
 
-    if mode=='platonic':
+    if mode in ['platonic', 'multiplat']:
         net.b_given_a = [random(), random()]
     else:
         net.b_given_a = p_cd_given_nod2
 
-    if mode!='multi':
+    if mode in ['platonic', 'crohns']:
         net.c_given_ab=[random(), random()]
         net.c_given_ab = [net.c_given_ab]*2
-    else:
+    elif mode=='multi':
         p_bact_given_cd = [ random() * 0.4 + 0.1 ]
         p_bact_given_cd.append( p_bact_given_cd[0] + random()*0.4  )
         net.c_given_ab=[[ p_bact_given_cd[0], p_bact_given_cd[1] ],
                         [ p_bact_given_cd[0] + random()*0.2 - 0.1, p_bact_given_cd[1] + random()*0.2 - 0.1 ]]
+    else:
+        net.c_given_ab = [[ random(), random() ], [ random(), random() ]]
 
     data = simulate(net, n)
-    if mode!='platonic':
+    if mode not in ['platonic', 'multiplat']:
         cnt = count(zip(*data))
         if any(cnt, lambda(x):x==0):
             continue
@@ -122,7 +144,12 @@ while i < runs:
             continue
         if mode=='multi' and chi2_contingency(count(zip(data[0],data[2])))[1]<.01:
             continue
-
+    elif mode=='multiplat':
+        cnt = count(zip(*data))
+        if any(cnt, lambda(x):x==0):
+            continue
+        if chi2_contingency(count(zip(data[0],data[2])))[1] < chi2_contingency(count(zip(data[0],data[1])))[1]:
+            continue
     try:
         dir=direction(data[0], data[1], data[2], n, p_nod2, p_cd_given_nod2)
         #print dir.bayes_fwd_rev

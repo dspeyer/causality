@@ -13,6 +13,7 @@
 \usepackage[superscript,biblabel]{cite}
 \usepackage{multirow,tabularx}
 \usepackage{hhline}
+\usepackage{amsmath}
 
 \newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
 \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
@@ -95,26 +96,28 @@ link between $A$ and $C$, and furthermore that there are no unobserved
 confounders or selection effects.  We will consider these later.
 This leaves us only two models, $A \rightarrow B \rightarrow C$ or $A
 \rightarrow B \leftarrow C$.  We can call these ``chain'' and
-``collide'' models.  Can we distinguish between them?
+``collide'' models, or $m_{ch}$ and $m_{co}$ for short.  Can we
+distinguish between them?
 
 Yes.  Let us consider
 $p(A,C)$:
 
-\begin{eqnarray}
-p(A,C|chain) & = & \sum_B p(A)p(B|A)p(C|B) \\
-p(A,C|collide) & = & p(A)p(C)
-\end{eqnarray}
+\begin{eqnarray*}
+p(A,C|m_{ch}) & = & \sum_B p(A)p(B|A)p(C|B) \\
+p(A,C|m_{co}) & = & p(A)p(C)
+\end{eqnarray*}
 
 We do not actually know the terms on the right side of those
 equations, so let us parameterize both models with $\theta$ and
 rewrite the equations as:
 
-\begin{eqnarray}
-  p(A,C|chain) & = & \int \left ( 
-  \sum_B p(A|\theta)p(B|A,\theta)p(C|B,\theta)
-  \right ) p(\theta) d\theta \\
-  p(A,C|collide) & = & \int p(A|\theta)p(C|\theta)p(\theta) d\theta
-\end{eqnarray}
+
+\begin{multline*}
+  p(A,C|m_{ch}) = \\
+  \int \left ( \sum_B p(A|\theta) p(B|A,\theta) 
+  p(C|B,\theta) \right ) p(\theta) d\theta \\
+  p(A,C|m_{co}) = \int p(A|\theta)p(C|\theta)p(\theta) d\theta
+\end{multline*}
 
 We can learn $p(\theta)$ from available data using dirichlet priors.
 The integrals would be difficult algebraically, but they can be
@@ -123,9 +126,9 @@ adequately approximated with monte-carlo sampling.
 Once we have these, let $n_{a,c}$ be the count of datapoints with
 A=a,C=c and we can use:
 
-\begin{equation}
-p(n_*|model) = \prod_{a,c} p(a,c|model)^{n_{a,c}}
-\end{equation}
+\begin{equation*}
+p(n_*|m) = \prod_{a,c} p(a,c|m)^{n_{a,c}}
+\end{equation*}
 
 From here, we can apply standard bayesian updating.  Empirically, this
 works well, in a test of 10k runs of each model with random parameters
@@ -151,4 +154,30 @@ will see a correlation between $A$ and $C$.  And if the direct
 influence is in the same direction as the indirect, the correct model
 will remain the better fit (though both models will be worse).
 
+To put this more precisely, a false collider occurs when:
+
+\begin{equation*}
+  \prod_{A,C} p(A,C|m_{co})^{n_{A,C}}  > 
+  \prod_{A,C} p(A,C|m_{ch})^{n_{A,C}}
+\end{equation*}
+\begin{equation*}
+  MI(A,C)  <  MI(B,C)
+\end{equation*}
+
+Which is difficult to work with algebraically, but can be reasonably
+approximated as:
+
+\begin{equation*}
+  \sum_{A,C} \log \left ( \frac{p(A,C|m_{co})}{p(A,C|m_{ch})} \right )
+  p(A,C|m_{NSC})  >  0
+\end{equation*}
+\begin{equation*}
+  |p(C|a)-p(C|\bar{a})|  <  |p(C|b)-p(C|\bar{b})
+\end{equation*}
+
+Which is still difficult to work with, but easy to examine
+numerically.  Assuming all probability are equally likely, roughly
+49\% of causal networks are never considered because $A\not\indep C$
+is more apparent than $B\not\indep C$, 28\% give the proper direction
+and 23\% give false colliders.
 \end{document}
