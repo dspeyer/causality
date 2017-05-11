@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from utils import count, p_of_val, deepcopy, mularr
+from utils import count, p_of_val, deepcopy, mularr, sumarr
 from math import log, exp
 from numpy.random import beta
 
@@ -72,6 +72,8 @@ def mle(a,b,cut,verbose=False):
 def montecarlo(a,b,cut,verbose=False):
     cntall = count(zip(a,b))
     cntcut = count(zip(cut,a,b))
+    sumarr(cntall, 0.1)
+    sumarr(cntcut, 0.1)
 
 #    p_ab_given_indep = deepcopy(cntall)
 #    mularr(p_ab_given_indep, 1.0/len(a))
