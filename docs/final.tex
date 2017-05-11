@@ -36,14 +36,16 @@ and work backward to the causal graph.
 
 This has proved to be more difficult in practice.  In particular,
 observing independence is not as simple as it sounds.  Pearl suggests
-we test joint conditional probability distributions for equality.
+we test joint conditional probability distributions for equality\cite{Pearl}.
 Leaving aside the curse of dimensionality, this assumes we have the
 exact distributions.  If all we have is a finite random sample from
 those distributions, we can construct posteriors, but we cannot perform
-an equality test.  [Someone] encourages us to ``assume our statistical
-tools for testing independence are adequate'', while admitting they
-likely are not.  [Someone] describes this as ``possessing an
-independence oracle''.  Many simply include a ``test if $a\indep
+an equality test.  Spirtes, Glymour and Shine  encourage us to assume
+``the statistical decisions required by the [causal inference]
+algorithms are correct
+for the population'', while admitting that this ``is often not met in
+practice''\cite{Spirtes}.  Others have described this as ``possessing an
+independence oracle''\cite{Peters,pcalg}.  Many simply include a ``test if $a\indep
 b|s$'' step in their algorithms, assuming the reader will already know
 how.
 
@@ -65,15 +67,16 @@ compensation.
 This paper is optimized around a specific practical problem:
 untangling the microbiome's role in Illial Crohn's Disease.  It is
 well established that there are many differences in the intestinal
-bacteria of healthy people and of people with the disease, but it is
+bacteria of healthy people and of people with the disease\cite{hofer}, but it is
 not established whether the differences of bacteria \textit{cause} the
 disease.  If we can find a set of bacteria such that
 p(disease|do(bacteria)) is low, we will have a cure for the disease.
 There have been attempts to determine this by randomized controlled
-trial, but the number of species, combined with other relevant
+trial, but early results are discouraging\cite{rctma} and the number
+of species, combined with other relevant
 variables, make exhaustive RCTs impractical.
 
-Data is available on this problem, including genetic, microbiome and
+Data is available on this problem\cite{data}, including genetic, microbiome and
 health information, but for only 58 patients.  The microbiome
 information is a series of 16S reads, but can generally be described
 as ``present'' or ``absent'', with very low concentrations of a
@@ -127,8 +130,11 @@ Once we have these, let $n_{a,c}$ be the count of datapoints with
 A=a,C=c and we can use:
 
 \begin{equation*}
-p(n_*|m) = \prod_{a,c} p(a,c|m)^{n_{a,c}}
+p(n_*|m) \propto \prod_{a,c} p(a,c|m)^{n_{a,c}}
 \end{equation*}
+
+Proportional instead of equal because there is a combinatoric term,
+but it cancels when taking odds ratios so it can be safely ignored.
 
 From here, we can apply standard bayesian updating.  Empirically, this
 works well, in a test of 10k runs of each model with random parameters
@@ -172,7 +178,7 @@ approximated as:
   p(A,C|m_{NSC})  >  0
 \end{equation*}
 \begin{equation*}
-  |p(C|a)-p(C|\bar{a})|  <  |p(C|b)-p(C|\bar{b})
+  |p(C|a)-p(C|\bar{a})| < |p(C|b)-p(C|\bar{b})
 \end{equation*}
 
 Which is still difficult to work with, but easy to examine
@@ -180,4 +186,45 @@ numerically.  Assuming all probability are equally likely, roughly
 49\% of causal networks are never considered because $A\not\indep C$
 is more apparent than $B\not\indep C$, 28\% give the proper direction
 and 23\% give false colliders.
+
+\subsubsection{False Chains}
+
+Similarly, can a true graph of
+$A\tikzmark{a2}\rightarrow B \leftarrow{C}\tikzmark{c2}$
+\underarrow{a2}{c2}
+produce a $p(A,C)$ more similar to a graph
+$A \rightarrow B \rightarrow C$?  Again, this requires rather precise
+parameters.
+
+\section{Parsimony}
+
+Given 
+
+\begin{thebibliography}{11}
+\bibitem{Pearl} Pearl ``Causality: Models, Reasoning and Inference''
+  Chapter 2 \textit{Springer} 2008
+
+\bibitem{Spirtes} Spirtes, Glymour \& Scheines ``Causation,
+  Prediction, and Search'' Section 5.4 \textit{MIT Press} 2001
+
+\bibitem{Peters} Peters, Mooij, Janzing \& Sch{\"o}lkopf ``Causal
+  Discovery with Continuous Additive Noise Models'' \textit{Journal of
+    Machine Learning Research} 2015
+
+\bibitem{pcalg} Kalisch, M{\"a}chler, Colombo, Maathuis \&
+  B{\"u}hlmann ``Causal Inference Using Graphical Models with the R
+  Package pcalg'' \textit{Journal of Statistical Software} 2012
+
+\bibitem{hofer} Hofer ``Bacterial imbalance in Crohn's disease''
+  \textit{Nature Reviews Microbiology} 2014
+
+\bibitem{rctma} C Prantera ``Probiotics for Crohn’s Disease: What
+  Have We Learned?'' \textit{Gut} 55.6(2006):757–759, 2016
+
+\bibitem{data} E Li, D Frank \& R Sartor, ``Effect of Crohn’s Disease Risk
+  Alleles on Enteric Microbiota'' \textit{Encyclopedia of
+    Metagenomics},  1-5, 2014
+  
+\end{thebibliography}
+
 \end{document}

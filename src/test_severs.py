@@ -9,8 +9,8 @@ from sys import stdout
 from random import random
 from simulate_causal_net import simulate
 from collections import defaultdict
-from severs import conditional as severs
-from utils import struct, count, any
+from severs import montecarlo as severs
+from utils import struct, count, any#, severs
 
 tot=defaultdict(lambda:0)
 hit=defaultdict(lambda:0)
@@ -24,7 +24,7 @@ def record(sev, truth):
     if truth:
         hit[rpost] += 1
 
-for i in range(10):
+for i in range(10000):
     net=struct()
     net.a = (random()*.4)+.4
     net.b_given_a=[random()*.6+.2]
@@ -37,12 +37,12 @@ for i in range(10):
     if any(cnt, lambda(x):x==0):
         continue
     try:
-        print "--- %s ---" % net
+#        print "--- %s ---" % net
         sev = severs(data[0], data[1], data[2])
         record(sev, False)
         #        if sev>10:
         #            print net
-        print "Severs:"
+#        print "Severs:"
         sev = severs(data[0], data[2], data[1])
         record(sev, True)
         sev = severs(data[1], data[2], data[0])
@@ -51,4 +51,4 @@ for i in range(10):
         print 'skipping %s with count %s' % (net, count(zip(*data)))
 
 for i in range(cats+1):
-    print '%f: %f (%d)' % (i/float(cats), tot[i] and float(hit[i])/tot[i] or -1, tot[i])
+    print '%f: %f n= %d' % (i/float(cats), tot[i] and float(hit[i])/tot[i] or -1, tot[i])
