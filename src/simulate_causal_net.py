@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from utils import *
-from random import random
+from random import random, choice
 
 class RandUniq(object):
     def __init__(self):
@@ -56,12 +56,13 @@ def create_big_net(n, outlinks):
     out = []
     for i in range(n):
         out.append([0]*n)
-        if i < n-outlinks-1:
+    for i in range(n):
+        if i < n-outlinks:
             poss = range(i+1, n)
-            for i in range(outlinks):
+            for j in range(outlinks):
                 ol = choice(poss)
                 poss.remove(ol)
-                out[i][ol] = (random()+1) * (random() or -1)
+                out[i][ol] = (random()+1) * (random()<.5 or -1)
     return out
 
 def simulate_big_net(net, n):
@@ -74,7 +75,8 @@ def simulate_big_net(net, n):
             effects = 0
             for cause in range(var):
                 val = out[cause][-1]
-                factor = net[var][cause]
+                factor = net[cause][var]
                 effects += (val or -1) * factor
-            p = 1 / (1 + exp(-effects/5))
+            p = 1 / (1 + exp(-effects))
             out[var].append(random()<p)
+    return out

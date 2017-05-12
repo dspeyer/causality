@@ -39,10 +39,6 @@ def mle(a,b,cut,verbose=False):
     cntcut = count(zip(cut,a,b))
     p_b_given_a = [float(x[1])/sum(x) for x in cntall]
     p_a_given_b = [float(x[1])/sum(x) for x in zip(*cntall)]
-
-#    p_ab_given_indep = deepcopy(cntall)
-#    mularr(p_ab_given_indep, 1.0/len(a))
-
     logbfs=[0,0]
     for cutv in range(2):
         cnt = cntcut[cutv]

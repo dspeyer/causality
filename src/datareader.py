@@ -11,11 +11,11 @@ class Data:
         self.bacteria={}
 
     def read_from_files(self, 
-                        sick_fn='../study2_sick.txt',
-                        gene_fn='../study2_genome.txt',
-                        sample_fn='study2/gsi',
-                        sex_fn='study2/sex',
-                        bact_dir='study2/'):
+                        sick_fn='../../study2_sick.txt',
+                        gene_fn='../../study2_genome.txt',
+                        sample_fn='../study2/gsi',
+                        sex_fn='../study2/sex',
+                        bact_dir='../study2/'):
         for fn in [sick_fn, gene_fn]:
             for line in file(fn):
                 line = line.strip()

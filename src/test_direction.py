@@ -17,12 +17,21 @@ hit=defaultdict(lambda:0)
 
 cats=20
 
+logloss = 0
+count = 0
+
 def record(dir, truth):
+    global logloss
+    global count
     post = 1.0 / (1 + 1/dir.bayes_fwd_rev) # prior=0.5
     rpost = round(post*cats)
     tot[rpost] += 1
+    count += 1
     if truth:
         hit[rpost] += 1
+        logloss += log(post)
+    else:
+        logloss += log(1-post)
 
 n = 58
 p_nod2 = 0.39
@@ -162,3 +171,5 @@ print '%d rev (took %d tries)' % (i, tries)
 
 for i in range(cats+1):
     print '%f: %f (%d)' % (i/float(cats), tot[i] and float(hit[i])/tot[i], tot[i])
+
+print 'Average log loss = %.2f' % (logloss/count)

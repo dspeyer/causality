@@ -14,6 +14,7 @@
 \usepackage{multirow,tabularx}
 \usepackage{hhline}
 \usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
 
 \newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
 \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
@@ -40,7 +41,7 @@ we test joint conditional probability distributions for equality\cite{Pearl}.
 Leaving aside the curse of dimensionality, this assumes we have the
 exact distributions.  If all we have is a finite random sample from
 those distributions, we can construct posteriors, but we cannot perform
-an equality test.  Spirtes, Glymour and Shine  encourage us to assume
+an equality test.  Spirtes, Glymour and Shine  encourage us to assume that
 ``the statistical decisions required by the [causal inference]
 algorithms are correct
 for the population'', while admitting that this ``is often not met in
@@ -62,7 +63,7 @@ hypotheses at once.  A flat accuracy of 99\% is unhelpful in the face
 of this, but a numeric expression of confidence allows proper
 compensation.
 
-\subsection{Inspiring Problem: Crohn's Disease}
+\subsection{Motivating Problem: Crohn's Disease}
 
 This paper is optimized around a specific practical problem:
 untangling the microbiome's role in Illial Crohn's Disease.  It is
@@ -70,7 +71,7 @@ well established that there are many differences in the intestinal
 bacteria of healthy people and of people with the disease\cite{hofer}, but it is
 not established whether the differences of bacteria \textit{cause} the
 disease.  If we can find a set of bacteria such that
-p(disease|do(bacteria)) is low, we will have a cure for the disease.
+p(disease $|$ do(bacteria)) is low, we will have a cure for the disease.
 There have been attempts to determine this by randomized controlled
 trial, but early results are discouraging\cite{rctma} and the number
 of species, combined with other relevant
@@ -91,8 +92,8 @@ known effect, and a variable which connects to the effect in an
 unknown way, that is $A \rightarrow B$ -- $C$.  We do not observe a
 correlation between $A$ and $C$, but that might only mean our test is
 underpowered.  For Crohn's Disease, $A$ would be mutations in the NOD2
-gene, $B$ would be the disease, and $C$ would be each of [number]
-species of bacteria.
+gene\cite{nod2}, $B$ would be the disease, and $C$ would be each of 222
+species of plausibly relevant bacteria.
 
 For now, we will assume that there is no direct causal
 link between $A$ and $C$, and furthermore that there are no unobserved
@@ -224,6 +225,10 @@ Given
 \bibitem{data} E Li, D Frank \& R Sartor, ``Effect of Crohn’s Disease Risk
   Alleles on Enteric Microbiota'' \textit{Encyclopedia of
     Metagenomics},  1-5, 2014
+
+\bibitem{nod2}  Philpott, Sorbara, Robertson, Croitoru \& Girardin,
+  ``NOD proteins: regulators of inflammation in health and disease''
+  \textit{Nature Reviews: Immunology} 2014
   
 \end{thebibliography}
 
