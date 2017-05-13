@@ -94,8 +94,8 @@ health information, but for only 58 patients.  The microbiome
 information is a series of 16S reads, but can generally be described
 as ``present'' or ``absent'', with very low concentrations of a
 species rounded off to ``absent''.  This comes much closer to fitting
-the empirical distributions than any convenient scalar formula, which
-is why this paper will use binary variables.
+the empirical distributions than any convenient scalar formula (see
+figure \ref{nonnormal}), which is why this paper will use binary variables.
 
 \section{Extending Graphs}
 
@@ -227,7 +227,7 @@ This technique is vulnerable to confounders.  Specifically, if the
 $B-C$ link is the product of a common cause, that will generate no
 $A-C$ dependence, exactly like a collider.
 
-\section{Building a Graph}
+\subsection{Building a Graph}
 
 This technique may be iterated to expand a graph, though whether it
 will suffice to describe an entire graph depends on the specifics.
@@ -420,6 +420,17 @@ to start RCTs than anything we had before.
 \section{Figures}
 
 \begin{figure}[h!]
+  \includegraphics[width=\textwidth]{nonnormal}
+  \caption{Histogram of representative interesting bacterial species.
+    The fractions are rounded up before taking logs to avoid log(0).
+    These could be approximated as normal, albeit not especially well,
+    were it not for the giant spikes on the left.  Perhaps a compound
+    model would be possible, but so many degrees of freedom become
+    tricky to work with.}
+  \label{nonnormal}
+\end{figure}
+  
+\begin{figure}
   \includegraphics[width=\textwidth]{direction_platonic_58}
   \caption{Simulated data using 10k each chain and collide models with
     flatly random parameters, using 0.05-sized buckets for the

@@ -63,7 +63,7 @@ for s1 in interesting:
             if link(v1,sick)<.01 and link(v2,sick)<.01:
                 sev=severs.mle(v2,sick,v1)
                 if sev>2:
-                    print '%s & %s & %s & %s & %.2f \\\\' % (s1, prettyco(co[s1]), s2, s3, sev)
+                    print '%s & %s & %s & %s & %.2f \\\\' % (s1, prettyco(cos[s1]), s2, s3, sev)
 
 print
                     
