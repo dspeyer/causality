@@ -360,6 +360,12 @@ which bacteria are in the intestine, but where in the intestine they
 are.  This result is inconvenient because removing or moving bacteria
 is far more difficult than adding them.
 
+The severing test offers more possible species (see figure
+\ref{sev_tab}).  The bayes factors are higher, but the overall
+complexity of the test is reason to be nervous.  This test also took
+extremely long to run, which may require fixing before it can be used
+seriously.
+
 The species without strong bayes factors are still encouraging.  The
 p-value confirms they relate to Crohn's Disease in some way, in which
 case ``causes'' and ``is caused by'' are the most likely models by
@@ -485,6 +491,28 @@ to start RCTs than anything we had before.
     direction test described here to establish that it causes (or
     prevents) the disease.}
   \label{dir_tab}
+\end{figure}
+
+\begin{figure}
+  \begin{tabular}{llllr}
+    Species & Sick When & Severs & Third in Trio & Bayes Factor \\
+    Coprococcus catus & $\leq$2.67E-04 & B intestinihominis & O splanchnicus & 33.34 \\
+Faecalibacterium prausnitzii & $\leq$1.43E-02 & B xylanolyticus & P hordei & 28.48 \\
+Flavobacterium thermophilum & $>$2.23E-04 & S infantis & A flavithermus & 83.28 \\
+Clostridium glycyrrhizinilyticum & $\leq$4.84E-04 & R faecis & A johnsonii & 46.54 \\
+Eubacterium oxidoreducens & $\leq$1.57E-03 & C eutactus & C cellobioparum & 32.67 \\
+Bacteroides helcogenes & $\leq$5.10E-04 & L crispatus & B helcogenes & 18.03 \\
+Anoxybacillus flavithermus & $>$2.97E-04 & G subterraneus & F thermophilum & 337.11 \\
+Clostridium formicaceticum & $\leq$1.74E-04 & A indistinctus & F prausnitzii & 13.29 \\
+Streptococcus oralis & $>$1.07E-04 & S sanguinis & V dispar & 13.49 \\
+Sporobacter termitidis & $\leq$2.47E-04 & E ruminantium & T forsythia & 106.95 \\
+  \end{tabular}
+  \caption{Incomplete output of the trio-and-sever test.  All trios
+    established p<0.01.  The first species is the one that appears to
+    impact Crohn's Disease; the second is the one that the correlates
+    with disease until the first is controlled for, and the third is a
+    third with a common cause.}
+  \label{sev_tab}
 \end{figure}
 
 \end{document}
