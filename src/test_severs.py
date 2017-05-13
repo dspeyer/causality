@@ -17,12 +17,21 @@ hit=defaultdict(lambda:0)
 
 cats=20
 
+everything=0
+logloss=0
+
 def record(sev, truth):
+    global everything
+    global logloss
     post = 1.0 / (1 + 1/sev) # prior=1/3
     rpost = round(post*cats)
     tot[rpost] += 1
+    everything += 1
     if truth:
         hit[rpost] += 1
+        logloss += log(post)
+    else:
+        logloss += log(1-post)
 
 for i in range(10000):
     net=struct()
@@ -46,10 +55,14 @@ for i in range(10000):
         #        if sev>10:
         #            print net
 #        print "Severs:"
-        sev = severs(data[0], data[2], data[1])
-        record(sev, True)
+#        sev = severs(data[0], data[1], data[2])
+#        record(sev, False)
 #        sev = severs(data[1], data[2], data[0])
 #        record(sev, False)
+       sev = severs(data[0], data[2], data[1])
+       record(sev, True)
+       sev = severs(data[1], data[2], data[0])
+       record(sev, False)
     except (ValueError,ZeroDivisionError):
         print 'skipping %s with count %s' % (net, count(zip(*data)))
 
@@ -64,3 +77,5 @@ for i in range(10000):
 
 for i in range(cats+1):
     print '%f: %f n= %d' % (i/float(cats), tot[i] and float(hit[i])/tot[i] or -1, tot[i])
+
+print 'Average log loss = %.2f' % (logloss/(everything))

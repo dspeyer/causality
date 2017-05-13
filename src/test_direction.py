@@ -18,7 +18,6 @@ hit=defaultdict(lambda:0)
 cats=20
 
 logloss = 0
-count = 0
 
 def record(dir, truth):
     global logloss
@@ -26,7 +25,6 @@ def record(dir, truth):
     post = 1.0 / (1 + 1/dir.bayes_fwd_rev) # prior=0.5
     rpost = round(post*cats)
     tot[rpost] += 1
-    count += 1
     if truth:
         hit[rpost] += 1
         logloss += log(post)
@@ -44,9 +42,6 @@ if mode not in ['platonic', 'crohns', 'multi', 'multiplat']:
 runs=int(argv[2])
 if len(argv)>3:
     n=int(argv[3])
-
-if mode=='multiplat':
-    n=1000
 
 ### Collider
 
@@ -75,9 +70,8 @@ while i < runs:
     net.c_given_ab=[[0,0],[0,0]]
     if mode in ['platonic', 'multiplat']:
         for b in range(2):
-            r=random()
             for a in range(2):
-                net.c_given_ab[a][b]=r
+                net.c_given_ab[a][b]=random()
     else:
         while min(net.c_given_ab[0][1],net.c_given_ab[1][1])<=0 or max(net.c_given_ab[0][1],net.c_given_ab[1][1])>=1:
             net.c_given_ab[0][0] = random()
@@ -107,13 +101,6 @@ while i < runs:
     i += 1
 
 print '%d fwd (took %d tries)' % (i, tries)
-
-if mode=='multiplat':
-    for i in range(cats+1):
-        print '%f: %f (%d)' % (i/float(cats), tot[i] and float(hit[i])/tot[i], tot[i])
-    tot=defaultdict(lambda:0)
-    hit=defaultdict(lambda:0)
-
 
 ### Chain
 
@@ -157,7 +144,7 @@ while i < runs:
         cnt = count(zip(*data))
         if any(cnt, lambda(x):x==0):
             continue
-        if chi2_contingency(count(zip(data[0],data[2])))[1] < chi2_contingency(count(zip(data[0],data[1])))[1]:
+        if chi2_contingency(count(zip(data[0],data[2])))[1] < chi2_contingency(count(zip(data[0],data[1])))[1]*10:
             continue
     try:
         dir=direction(data[0], data[1], data[2], n, p_nod2, p_cd_given_nod2)
@@ -172,4 +159,4 @@ print '%d rev (took %d tries)' % (i, tries)
 for i in range(cats+1):
     print '%f: %f (%d)' % (i/float(cats), tot[i] and float(hit[i])/tot[i], tot[i])
 
-print 'Average log loss = %.2f' % (logloss/count)
+print 'Average log loss = %.2f' % (logloss/(2*runs))

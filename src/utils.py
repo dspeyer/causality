@@ -230,6 +230,7 @@ def div(a, b):
 
 def link(a,b):
     cnt = count(zip(a, b))
+    sumarr(cnt, 0.1)
     return chi2_contingency(cnt)[1]
 
 def link_despite(a,b,despite):

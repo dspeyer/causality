@@ -15,6 +15,7 @@
 \usepackage{hhline}
 \usepackage{amsmath}
 \usepackage[margin=1in]{geometry}
+\usepackage{cancel}
 
 \newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
 \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
@@ -82,8 +83,8 @@ health information, but for only 58 patients.  The microbiome
 information is a series of 16S reads, but can generally be described
 as ``present'' or ``absent'', with very low concentrations of a
 species rounded off to ``absent''.  This comes much closer to fitting
-the empirical distributions than any convenient scalar formula (see
-figure 1) which is why this paper will use binary variables.
+the empirical distributions than any convenient scalar formula, which
+is why this paper will use binary variables.
 
 \section{Extending Graphs}
 
@@ -138,8 +139,26 @@ Proportional instead of equal because there is a combinatoric term,
 but it cancels when taking odds ratios so it can be safely ignored.
 
 From here, we can apply standard bayesian updating.  Empirically, this
-works well, in a test of 10k runs of each model with random parameters
-(see figure).
+works well.  With all probabilities chosen at random, the mean log
+probability it assigns to the wrong model is only -0.62.  Furthermore,
+if the output is bucketed by posterior, the fraction correct forms a
+graph very similar to a straight line (see figure \ref{dir_pla58}).
+It does show a minor bias toward chain models, but it goes away at the
+edges, and collider models are the useful ones, so this is a safe bias.
+
+While the test is well-calibrated, it returns bayes factors very close
+to one most of the time.  For random probabilities and 58 datapoints,
+it only gives a clear answer (i.e. a bayes factor outside the range
+[0.1,10] 8\% of the time).  This includes cases in which one of the
+causal effects is very weak.  Altering the generative function to more
+closely resemble the Crohn's data (by having the real p(NOD2) and
+p(Crohn's$|$NOD2) and detectable $B\not\indep C$) brings this up to
+13\%.  Even with realistic data, 500 datapoints are needed to gain
+conclusive answers more than half the time (see figure
+\ref{dir_use}).  The realistic data does make the test somewhat less
+calibrated (figure \ref{dir_crohns58}), which probably reflects a
+collide model being more likely to produce Crohns-like data in the
+first place, but the errors remain small and on the side of safety.
 
 \subsection{Non-Simply-Connected Graphs}
 
@@ -161,45 +180,183 @@ will see a correlation between $A$ and $C$.  And if the direct
 influence is in the same direction as the indirect, the correct model
 will remain the better fit (though both models will be worse).
 
-To put this more precisely, a false collider occurs when:
-
-\begin{equation*}
-  \prod_{A,C} p(A,C|m_{co})^{n_{A,C}}  > 
-  \prod_{A,C} p(A,C|m_{ch})^{n_{A,C}}
-\end{equation*}
-\begin{equation*}
-  MI(A,C)  <  MI(B,C)
-\end{equation*}
-
-Which is difficult to work with algebraically, but can be reasonably
-approximated as:
-
-\begin{equation*}
-  \sum_{A,C} \log \left ( \frac{p(A,C|m_{co})}{p(A,C|m_{ch})} \right )
-  p(A,C|m_{NSC})  >  0
-\end{equation*}
-\begin{equation*}
-  |p(C|a)-p(C|\bar{a})| < |p(C|b)-p(C|\bar{b})
-\end{equation*}
-
-Which is still difficult to work with, but easy to examine
-numerically.  Assuming all probability are equally likely, roughly
-49\% of causal networks are never considered because $A\not\indep C$
-is more apparent than $B\not\indep C$, 28\% give the proper direction
-and 23\% give false colliders.
-
 \subsubsection{False Chains}
 
 Similarly, can a true graph of
 $A\tikzmark{a2}\rightarrow B \leftarrow{C}\tikzmark{c2}$
 \underarrow{a2}{c2}
 produce a $p(A,C)$ more similar to a graph
-$A \rightarrow B \rightarrow C$?  Again, this requires rather precise
-parameters.
+$A \rightarrow B \rightarrow C$?  Again, this is possible, but there
+is no reason for $p(C|A)$ to resemble $\sum_B p(B|A)p(C|B)$.  If
+$p(C|A)-p(C|\bar{A})$ is too large, $A\not\indep C$ will be detected
+initially, whereas if it's too small, the correct model will be
+chosen.  Furthermore, what shrinks the upper bound is for the
+predicted A-C relation in the chain model to be small, which also
+means any erroneous bayes factor will be small.
+
+\subsubsection{Empirical Examination}
+
+These examinations are difficult to make rigorous, but simulation
+suggests there is little to worry about.  If an $A\rightarrow C$ link
+is added but bounded by a $\chi^2$ test, there is a tendency toward
+underconfidence, but little other effect (see figure
+\ref{dir_multi58}.  This applies to the Crohns-like case, and does not
+fully generalize.
+
+Overall, this technique is not \textit{brittle} in the face of an
+$A \rightarrow C$ link, but it is not robust against an arbitrarily
+strong one either.  Domain knowledge or other tools must be used to
+establish safety.  In the case of Crohn's disease, the generally
+understood role of NOD2, mediates \textit{untargetted} immune
+responses,\cite{nod2} makes an $A\rightarrow C$ link unlikely
+
+\subsection{Unobserved Confounders}
+
+This technique is vulnerable to confounders.  Specifically, if the
+$B-C$ link is the product of a common cause, that will generate no
+$A-C$ dependence, exactly like a collider.
+
+\section{Building a Graph}
+
+This technique may be iterated to expand a graph, though whether it
+will suffice to describe an entire graph depends on the specifics.
+Since it does offer bayes factors, these can be used in the iteration,
+and provide a metric of when one has extrapolated too far from too
+little domain knowledge.
+
+\section{Severing}
+
+Suppose we do not have a known causal effect to expand from.  The
+standard oracle-requiring algorithms do not need one.  It is probably
+impossible for a formula to say that $A\not\indep B$ in full
+generality, but it may be possible to say $A\not\indep B|S$
+sufficiently for our purposes.
+
+Suppose A, B and S are already known to correlate.  The simplest
+associated models are S-A-B, A-S-B and A-B-S, where S severs only in
+the A-S-B case (the directions on the arrows are not important at the
+moment, except that there can be no colliders).  For the first two
+models:
+
+\begin{eqnarray*}
+  p(A,B|S,m_{\cancel{sever}}) & = & p(A|S)p(B|A) \\
+  p(A,B|S,m_{sever}) & = & p(A|S)p(B|S)
+\end{eqnarray*}
+
+And there is a symmetric formula for the last one.  Since there are
+two alternative hypotheses, we take whichever produces the greater
+probability.  Somewhat surprisingly, there is no advantage here in
+using monte-carlo posteriors of simple maximum likelihood estimators
+for the conditional probabilities.
+
+There is another simple causal graph that can cause three variables to
+correlate: all could be influenced by a common confounder $H$ (for
+``hidden).  This case is impossible to test for in full generality,
+because $S$ could follow $H$ so closely as to be an acceptable proxy,
+and therefore controlling for $S$ effectively controls for $H$.  In
+theory, it should be possible to infer $H$ and its conditionals usings
+a Gibbs-sampler-like system.  In practice, there is more room to
+overfit this more complex model and no straightforward way to
+compensate.  What does work surprisingly well is to ignore this case
+and apply the exact same test as before.
+
+Empirically, severing vs. chain has mean log p(false) of -.41 and
+vs. common cause has of -.49.  Both follow close to a straight line
+(see figure \ref{sever}).
+
+\subsection{Applying Severing}
+
+If we are willing to trust the severing test, can we use it to find
+causes of a variable of interest?  Deducing the entire causal graph
+is a brittle endevour, but there is a local solution.
+
+Suppose there exist three variable with a common cause, such that one
+causes the variable of interest, that is $H\tikzmark{h} \rightarrow A
+\rightarrow D \; B\tikzmark{b3} \; C\tikzmark{c3}$ \underarrow{h}{b3}
+\underarrow{h}{c3}.  The trio $A,B,C$ can be identified because they
+all correlate and remain correlated when controlling for any of them.
+No special test is needed for this, standard $\chi^2$ can produce a p
+value for all of this.  The role of $A$ can be identified because it
+severs $B$ and $C$ from $D$ (standing for ``disease'', remembering the
+application).  No other simply connected graph has these properties.
+
+This technique does not try to find \textit{all} causes of $D$, only
+those which happen to fit this motif and are strong enough for a
+$\chi^2$ test to pick up.  As such, it is unclear what it would mean
+to test it in simulation.  Certainly with parameters chosen for the
+purpose, it will work.  With random parameters, it will generally fail
+to find trios.
+
+\subsection{Unobserved Confounders}
+
+If the links between $H$ and $A,B,C$ in the preceeding graph are
+actually mutual effect from a confounder, then that confounder can be
+thought of as a part of $H$ (which is itself unobserved).  If the link
+between $A$ and $D$ is via confounder, then there will be no $B-D$ or
+$C-D$ link to sever.
+
+\subsection{Non-Simply-Connected Graphs}
+
+These techniques depend on simply-connected graphs.  Both the severing
+test and its application can say nothing of significance in the face
+of multiple connections.
 
 \section{Parsimony}
 
-Given 
+Given that it will be necessary to assume either ``no unobserved
+confounders'' or ``simple connection'', can we at least say that these
+are the most parsimonious explanations for our data?
+
+From a graphical model perspective, they are not.  It is the absence
+of a link which is a statement about the world.
+
+From a biochemical perspective, they are.  Each link asserts an
+interaction, and the default for organic molecules or micro-organisms
+is not to interact with eachother.  As for unobserved confounders, the
+presence of unobserved variables in biology is a given, but for them
+to be confounders requires \textit{two} interactions that relate to
+eachother.
+
+Fields other than biology will need to reconsider this.
+
+\section{Crohn's Disease}
+
+Returning to the original motivating problem, what do these techniques
+show for Crohn's Disease?
+
+The bacterial concentrations can be converted to boolean values by
+placing thresholds on them.  For each species, a threshold was chosen that
+maximized the number of Crohn's Disease statuses that could be
+correctly predicted by that bacterium alone.  These boolean values can
+then be thought of as ``has a clinically relevant dosage of the
+bacterium''.  Once the values were booleanized, all those with
+entropies less than 0.5 were dropped on the logic that a species
+that's always the same can't have a clinical effect.  This left 222
+species.
+
+Of these the direction technique found 8 which show signs of impacting
+Crohn's Disease, though only one (Lactobacillus acidophilus) has a
+bayes factor greater than 10.  The 8 are shown in figure \ref{dir_tab}.
+
+Inconveniently, that species appears to
+be \textit{harmful}, which is surprising given the usual role of
+lactobacilli but less so given that two RCTs found this same result
+(albeit nonsignificantly)\cite{lgg1,lgg2}.  It may be relevant that
+L. acidophilus is usually found in the
+\textit{jejunum}\cite{lacid}, but these samples are from
+\textit{ileum} biopsies.  Perhaps the cause of Crohn's Disease is not
+which bacteria are in the intestine, but where in the intestine they
+are.  This result is inconvenient because removing or moving bacteria
+is far more difficult than adding them.
+
+The species without strong bayes factors are still encouraging.  The
+p-value confirms they relate to Crohn's Disease in some way, in which
+case ``causes'' and ``is caused by'' are the most likely models by
+simple priors.  These small values bump our posterior belief some.
+This is not enough to recommend to patients, but it is a better place
+to start RCTs than anything we had before.
+
+\newpage
 
 \begin{thebibliography}{11}
 \bibitem{Pearl} Pearl ``Causality: Models, Reasoning and Inference''
@@ -230,6 +387,82 @@ Given
   ``NOD proteins: regulators of inflammation in health and disease''
   \textit{Nature Reviews: Immunology} 2014
   
+\bibitem{lgg1} C Prantera, M Scribano, G Falasco, A Andreoli, C Luzi
+  ``Ineffectiveness of probiotics in preventing recurrenece after
+  curative resection for Crohn's disease: a randomised controlled
+  trial with Lactobacillus GG.'' \textit{Gut}  200251405–409.409, 2002
+\bibitem{lgg2} A Bousvaros,  S Guendalini,  R Baldassano, C Botelho,
+  J Evans,  G Ferry,  B Goldin,  L Hartigan,  S Kugathasan,  J Levy,
+  K Murray,  M Oliva-Hemker,  J Rosh, V Tolia,  A Zholudev,  J
+  Vanderhoof \&  P Hibberd ``A randomized, double blind trial of
+  Lactobacillus GG versus placebo in addition to standard maintenance
+  therapy for children with Crohn's disease.'' \textit{Inflamm Bowel
+    Dis} 200511833–839.839, 2005
+\bibitem{lacid} J Walter ``Ecological Role of Lactobacilli in the
+  Gastrointestinal Tract: Implications for Fundamental and Biomedical
+  Research'' \textit{Appl. Environ. Microbiol.} 74(16):4985–4996, August 2008
+
 \end{thebibliography}
+
+\newpage
+\onecolumn
+\section{Figures}
+
+\begin{figure}[h!]
+  \includegraphics[width=\textwidth]{direction_platonic_58}
+  \caption{Simulated data using 10k each chain and collide models with
+    flatly random parameters, using 0.05-sized buckets for the
+    posterior.  Higher numbers indicate collider.}
+  \label{dir_pla58}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{usefullness}
+  \caption{Fraction of bayes factors that were at least 10:1 one way
+    or the other as a function of dataset size}
+  \label{dir_use}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{direction_crohns_58}
+  \caption{The same simulation as \ref{dir_pla58}, but with p(NOD2) and
+    p(ICD$|$NOD2) taken from data, and the independences measurable by
+    $\chi^2$ test.}
+  \label{dir_crohns58}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{direction_multi_58}
+  \caption{The same simulation as \ref{dir_crohns58}, but with
+    allowing an $A\rightarrow C$ causal link, albeit one which does
+    not show up as $A\not\indep C$ on a $\chi^2$ test.}
+  \label{dir_multi58}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{sever}
+  \caption{Calibration for the severing test, both in the case it was
+    designed for and in the case of comparing severing to common
+    cause.  Higher probabilities indicate severing.}
+  \label{sever}
+\end{figure}
+
+\begin{figure}
+  \begin{tabular}{llrr}
+    Species & Sick When & P-Value ICD link & Bayes Factor Causality \\
+    Streptococcus pseudopneumoniae & $>$6.36E-05 & 3.1e-05 & 5.15 \\
+    Streptococcus infantis & present & 0.0014 & 2.55 \\
+    Lactobacillus acidophilus & $>$8.15E-05 & 0.00017 & 10.64 \\
+    Sphingopyxis alaskensis & present & 0.0004 & 2.43 \\
+    Clostridium methylpentosum & $\leq$6.31E-04 & 0.00085 & 2.53 \\
+    Roseiflexus castenholzii & present & 7.3e-05 & 3.30 \\
+    Ruminococcus faecis & $\leq$1.07E-03 & 0.0022 & 2.40 \\
+  \end{tabular}
+  \caption{Results of the direction test on 222 interesting species,
+    using $\chi^2$ to check a relationship to Crohn's Disease and the
+    direction test described here to establish that it causes (or
+    prevents) the disease.}
+  \label{dir_tab}
+\end{figure}
 
 \end{document}

@@ -37,6 +37,8 @@ def logp_obs_given(cnt, p):
 def mle(a,b,cut,verbose=False):
     cntall = count(zip(a,b))
     cntcut = count(zip(cut,a,b))
+    sumarr(cntall, 0.1)
+    sumarr(cntcut, 0.1)
     p_b_given_a = [float(x[1])/sum(x) for x in cntall]
     p_a_given_b = [float(x[1])/sum(x) for x in zip(*cntall)]
     logbfs=[0,0]
