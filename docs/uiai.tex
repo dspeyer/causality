@@ -1,4 +1,11 @@
-\documentclass[twocolumn,12pt]{article}
+\documentclass[letterpaper]{article}
+\usepackage{proceed2e}
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
 \usepackage{tikz}
 \usetikzlibrary{calc}
 \newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
@@ -10,57 +17,66 @@
 \newcommand{\Ex}{\mathbb{E}}
 \usepackage{graphicx}
 \usepackage{dblfloatfix}
-\usepackage[superscript,biblabel]{cite}
+%\usepackage[superscript,biblabel]{cite}
 \usepackage{multirow,tabularx}
 \usepackage{hhline}
 \usepackage{amsmath}
-\usepackage[margin=1in]{geometry}
 \usepackage{cancel}
+
+\usepackage[style=nature, citestyle=authoryear, backend=biber,date=year]{biblatex}
+%\bibliographystyle{apa}
+\addbibresource{uiai.bib}
 
 \newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
 \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 
 \title{Inferring Causality from Finite Data using Conditional Independence}
-\author{Daniel Speyer}
-%\address{dls2192@columbia.edu}
+%\author{Daniel Speyer\\Columbia University}
+\author{}
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-  There exist many techniques for inferring causal structure from
-  conditional independence, but they all assume establishing
-  conditional independence is trivial, which from a finite sample it
-  is not.  Also, all return a graph,
-  rather than a graph and a probability that it is the correct one.
-  In this paper I offer two techniques of limited scope that address
-  these problems.  I then discuss the techniques limitations, and
-  apply them to finding probiotic treatments for Crohn's Disease.
+  We propose techniques for inferring causal structure from limited
+  observational data.  These techniques produce less extensive results
+  than those which require exact joint probabilities, but are more
+  practical.  Also, they offer numeric expressions of confidence for
+  their answers.  The general principle is to describe multiple
+  possible causal models with specific consequences and test those
+  consequences.  After developing these techniques abstractly, we test
+  them in simulation and on real world Crohn's Disease data.
 \end{abstract}
 
 \section{Introduction}
-
 Inferring causal graphs from observational data is a widely-sought
-goal in statistics.  The most common tool for it is conditional
+goal in statistics.  It is especially important in medicine, where
+finding the cause of a disease may provide a way to cure or prevent
+it, but finding an effect of a disease is of little practical value.
+Also in medicine, observational data is plentiful and finding
+correlations is easy, but running intervention studies is slow,
+expensive, regulated, and potentially dangerous.
+
+The most common tool for causal inference is conditional
 independence.  The specifics of a causal graph determine which node
 are independent conditioned on which others by the ``bayes ball''
 rule, and therefore it should be possible to observe the independences
 and work backward to the causal graph.
 
 This has proved to be more difficult in practice.  In particular,
-observing independence is not as simple as it sounds.  Pearl suggests
-we test joint conditional probability distributions for equality\cite{Pearl}.
+observing independence is not as simple as it sounds.  [\cite{Pearl}] suggests
+we test joint conditional probability distributions for equality.
 Leaving aside the curse of dimensionality, this assumes we have the
 exact distributions.  If all we have is a finite random sample from
 those distributions, we can construct posteriors, but we cannot perform
-an equality test.  Spirtes, Glymour and Shine  encourage us to assume that
+an equality test.  [\cite{Spirtes}] encourage us to assume that
 ``the statistical decisions required by the [causal inference]
 algorithms are correct
 for the population'', while admitting that this ``is often not met in
-practice''\cite{Spirtes}.  Others have described this as ``possessing an
-independence oracle''\cite{Peters,pcalg}.  Many simply include a ``test if $a\indep
-b|s$'' step in their algorithms, assuming the reader will already know
-how.
+practice''.  Others have described this as ``possessing an
+independence oracle'' [\cite{Peters,pcalg}].  Many simply include a
+``test if $a\indep b|s$'' step in their algorithms, assuming the
+reader will already know how.
 
 In practice, the usual solution is to treat independence as a null
 hypothesis, try to reject it at some p threshold, and treat any
@@ -80,16 +96,17 @@ compensation.
 This paper is optimized around a specific practical problem:
 untangling the microbiome's role in Illial Crohn's Disease.  It is
 well established that there are many differences in the intestinal
-bacteria of healthy people and of people with the disease\cite{hofer}, but it is
+bacteria of healthy people and of people with the disease [\cite{hofer}], but it is
 not established whether the differences of bacteria \textit{cause} the
 disease.  If we can find a set of bacteria such that
 p(disease $|$ do(bacteria)) is low, we will have a cure for the disease.
 There have been attempts to determine this by randomized controlled
-trial, but early results are discouraging\cite{rctma} and the number
+trial, but early results are discouraging [\cite{rctma}] and the number
 of species, combined with other relevant
 variables, make exhaustive RCTs impractical.
 
-Data is available on this problem\cite{data}, including genetic, microbiome and
+Data is available on this problem from [\cite{data}], including
+genetic, microbiome and
 health information, but for only 58 patients.  The microbiome
 information is a series of 16S reads, but can generally be described
 as ``present'' or ``absent'', with very low concentrations of a
@@ -104,7 +121,7 @@ known effect, and a variable which connects to the effect in an
 unknown way, that is $A \rightarrow B$ -- $C$.  We do not observe a
 correlation between $A$ and $C$, but that might only mean our test is
 underpowered.  For Crohn's Disease, $A$ would be mutations in the NOD2
-gene\cite{nod2}, $B$ would be the disease, and $C$ would be each of 222
+gene [\cite{nod2}], $B$ would be the disease, and $C$ would be each of 222
 species of plausibly relevant bacteria.
 
 For now, we will assume that there is no direct causal
@@ -219,7 +236,7 @@ $A \rightarrow C$ link, but it is not robust against an arbitrarily
 strong one either.  Domain knowledge or other tools must be used to
 establish safety.  In the case of Crohn's disease, the generally
 understood role of NOD2, mediates \textit{untargetted} immune
-responses,\cite{nod2} makes an $A\rightarrow C$ link unlikely
+responses, makes an $A\rightarrow C$ link unlikely [\cite{nod2}].
 
 \subsection{Unobserved Confounders}
 
@@ -352,9 +369,9 @@ bayes factor greater than 10.  The 8 are shown in figure \ref{dir_tab}.
 Inconveniently, that species appears to
 be \textit{harmful}, which is surprising given the usual role of
 lactobacilli but less so given that two RCTs found this same result
-(albeit nonsignificantly)\cite{lgg1,lgg2}.  It may be relevant that
+(albeit nonsignificantly) [\cite{lgg1,lgg2}].  It may be relevant that
 L. acidophilus is usually found in the
-\textit{jejunum}\cite{lacid}, but these samples are from
+\textit{jejunum} [\cite{lacid}], but these samples are from
 \textit{ileum} biopsies.  Perhaps the cause of Crohn's Disease is not
 which bacteria are in the intestine, but where in the intestine they
 are.  This result is inconvenient because removing or moving bacteria
@@ -375,51 +392,7 @@ to start RCTs than anything we had before.
 
 \newpage
 
-\begin{thebibliography}{11}
-\bibitem{Pearl} Pearl ``Causality: Models, Reasoning and Inference''
-  Chapter 2 \textit{Springer} 2008
-
-\bibitem{Spirtes} Spirtes, Glymour \& Scheines ``Causation,
-  Prediction, and Search'' Section 5.4 \textit{MIT Press} 2001
-
-\bibitem{Peters} Peters, Mooij, Janzing \& Sch{\"o}lkopf ``Causal
-  Discovery with Continuous Additive Noise Models'' \textit{Journal of
-    Machine Learning Research} 2015
-
-\bibitem{pcalg} Kalisch, M{\"a}chler, Colombo, Maathuis \&
-  B{\"u}hlmann ``Causal Inference Using Graphical Models with the R
-  Package pcalg'' \textit{Journal of Statistical Software} 2012
-
-\bibitem{hofer} Hofer ``Bacterial imbalance in Crohn's disease''
-  \textit{Nature Reviews Microbiology} 2014
-
-\bibitem{rctma} C Prantera ``Probiotics for Crohn’s Disease: What
-  Have We Learned?'' \textit{Gut} 55.6(2006):757–759, 2016
-
-\bibitem{data} E Li, D Frank \& R Sartor, ``Effect of Crohn’s Disease Risk
-  Alleles on Enteric Microbiota'' \textit{Encyclopedia of
-    Metagenomics},  1-5, 2014
-
-\bibitem{nod2}  Philpott, Sorbara, Robertson, Croitoru \& Girardin,
-  ``NOD proteins: regulators of inflammation in health and disease''
-  \textit{Nature Reviews: Immunology} 2014
-  
-\bibitem{lgg1} C Prantera, M Scribano, G Falasco, A Andreoli, C Luzi
-  ``Ineffectiveness of probiotics in preventing recurrenece after
-  curative resection for Crohn's disease: a randomised controlled
-  trial with Lactobacillus GG.'' \textit{Gut}  200251405–409.409, 2002
-\bibitem{lgg2} A Bousvaros,  S Guendalini,  R Baldassano, C Botelho,
-  J Evans,  G Ferry,  B Goldin,  L Hartigan,  S Kugathasan,  J Levy,
-  K Murray,  M Oliva-Hemker,  J Rosh, V Tolia,  A Zholudev,  J
-  Vanderhoof \&  P Hibberd ``A randomized, double blind trial of
-  Lactobacillus GG versus placebo in addition to standard maintenance
-  therapy for children with Crohn's disease.'' \textit{Inflamm Bowel
-    Dis} 200511833–839.839, 2005
-\bibitem{lacid} J Walter ``Ecological Role of Lactobacilli in the
-  Gastrointestinal Tract: Implications for Fundamental and Biomedical
-  Research'' \textit{Appl. Environ. Microbiol.} 74(16):4985–4996, August 2008
-
-\end{thebibliography}
+\printbibliography
 
 \newpage
 \onecolumn
