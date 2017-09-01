@@ -23,7 +23,11 @@
 \usepackage{amsmath}
 \usepackage{cancel}
 
-\usepackage[style=nature, citestyle=authoryear, backend=biber,date=year]{biblatex}
+\usepackage[style=nature,
+  citestyle=authoryear,
+  maxcitenames=3,
+  backend=biber,
+  date=year]{biblatex}
 %\bibliographystyle{apa}
 \addbibresource{uiai.bib}
 
@@ -41,9 +45,9 @@
   We propose techniques for inferring causal structure from limited
   observational data.  These techniques produce less extensive results
   than those which require exact joint probabilities, but are more
-  practical.  Also, they offer numeric expressions of confidence for
-  their answers.  The general principle is to describe multiple
-  possible causal models with specific consequences and test those
+  practical.  The general principle is to describe multiple
+  possible causal models in sufficient detail to have with specific
+  consequences and test those
   consequences.  After developing these techniques abstractly, we test
   them in simulation and on real world Crohn's Disease data.
 \end{abstract}
@@ -53,7 +57,7 @@ Inferring causal graphs from observational data is a widely-sought
 goal in statistics.  It is especially important in medicine, where
 finding the cause of a disease may provide a way to cure or prevent
 it, but finding an effect of a disease is of little practical value.
-Also in medicine, observational data is plentiful and finding
+Medicine is also a context in which observational data is plentiful and finding
 correlations is easy, but running intervention studies is slow,
 expensive, regulated, and potentially dangerous.
 
@@ -72,15 +76,17 @@ those distributions, we can construct posteriors, but we cannot perform
 an equality test.  [\cite{Spirtes}] encourage us to assume that
 ``the statistical decisions required by the [causal inference]
 algorithms are correct
-for the population'', while admitting that this ``is often not met in
+for the population'', while admitting that this requirement ``is often not met in
 practice''.  Others have described this as ``possessing an
 independence oracle'' [\cite{Peters,pcalg}].  Many simply include a
 ``test if $a\indep b|s$'' step in their algorithms, assuming the
 reader will already know how.
 
-In practice, the usual solution is to treat independence as a null
+In practice, the usual solution [\cite{akelleh,pcalg}] is to treat independence as a null
 hypothesis, try to reject it at some p threshold, and treat any
 failure as establishing it.  Needless to say, this is incorrect.
+[\cite{bayesnet}] punts the responsibility to the caller instead,
+which, while not actually wrong, is unhelpful
 
 Dealing with finite data means the possibility of dealing with too
 little data.  The elegant solution is to give some numerical
@@ -91,15 +97,33 @@ hypotheses at once.  A flat accuracy of 99\% is unhelpful in the face
 of this, but a numeric expression of confidence allows proper
 compensation.
 
+Traditional inference algorithms such as [\cite{Pearl}] generally
+construct the entire DAG by a series of logical deductions that depend
+on each other.  Such approaches do not translate easily to
+uncertainty.  If we took the posterior probability for each
+successive test in a traditional algorithm and multiplied them to get
+a posterior for the entire graph, the resulting posterior would likely
+be too low for any use, and might not be the overall plurality.
+Furthermore, the number of possible causal graphs is roughly
+exponential in the number of variables, so finding probabilities for
+all of them is intractable outside of toy problems (even
+\textit{storing} those probabilities is beyond the reach of real-world
+hardware for most interesting problems in medicine!).
+
+It may be possible to usefully approximate entire-DAG inference, but
+we will attempt a less ambitious solution: to infer, as accurately as
+possible, the direction of a single arrow.  Specifically, one pointing
+from a variable we can easily intervene on (a ``cure'') to one we care
+about (a ``disease'').
+
 \subsection{Motivating Problem: Crohn's Disease}
 
 This paper is optimized around a specific practical problem:
 untangling the microbiome's role in Illial Crohn's Disease.  It is
 well established that there are many differences in the intestinal
-bacteria of healthy people and of people with the disease [\cite{hofer}], but it is
-not established whether the differences of bacteria \textit{cause} the
-disease.  If we can find a set of bacteria such that
-p(disease $|$ do(bacteria)) is low, we will have a cure for the disease.
+bacteria of healthy people and of people with the disease
+[\cite{hofer}], but it is not established which (if any) of the differences of
+bacteria \textit{cause} the disease.  
 There have been attempts to determine this by randomized controlled
 trial, but early results are discouraging [\cite{rctma}] and the number
 of species, combined with other relevant
@@ -111,33 +135,37 @@ health information, but for only 58 patients.  The microbiome
 information is a series of 16S reads, but can generally be described
 as ``present'' or ``absent'', with very low concentrations of a
 species rounded off to ``absent''.  This comes much closer to fitting
-the empirical distributions than any convenient scalar formula (see
-figure \ref{nonnormal}), which is why this paper will use binary variables.
+the empirical distributions than any simple scalar formula, which is
+why this paper uses binary variables.
 
 \section{Extending Graphs}
 
 Let us begin with the simplest case.  Suppose we have a known cause, a
 known effect, and a variable which connects to the effect in an
-unknown way, that is $A \rightarrow B$ -- $C$.  We do not observe a
-correlation between $A$ and $C$, but that might only mean our test is
-underpowered.  For Crohn's Disease, $A$ would be mutations in the NOD2
-gene [\cite{nod2}], $B$ would be the disease, and $C$ would be each of 222
-species of plausibly relevant bacteria.
+unknown way.   For Crohn's Disease, the known cause is mutations in the NOD2
+gene [\cite{nod2}], the known effect is the disease, and the unknown
+is each of 222 species of plausibly relevant bacteria, taken
+independently.  To help keep our example in mind, we will refer to
+these factors as $G$ (``gene''), $D$ (``disease'') and $B$
+(``bacterium'').  So our initial graph is $G \rightarrow D$ -- $B$.
+We do not observe a
+correlation between $G$ and $B$, but that might only mean our test is
+underpowered.  
 
 For now, we will assume that there is no direct causal
-link between $A$ and $C$, and furthermore that there are no unobserved
+link between $G$ and $B$, and furthermore that there are no unobserved
 confounders or selection effects.  We will consider these later.
-This leaves us only two models, $A \rightarrow B \rightarrow C$ or $A
-\rightarrow B \leftarrow C$.  We can call these ``chain'' and
+This leaves us only two models, $G \rightarrow D \rightarrow B$ or $G
+\rightarrow D \leftarrow B$.  We can call these ``chain'' and
 ``collide'' models, or $m_{ch}$ and $m_{co}$ for short.  Can we
 distinguish between them?
 
 Yes.  Let us consider
-$p(A,C)$:
+$p(G,B)$:
 
 \begin{eqnarray*}
-p(A,C|m_{ch}) & = & \sum_B p(A)p(B|A)p(C|B) \\
-p(A,C|m_{co}) & = & p(A)p(C)
+p(G,B|m_{ch}) & = & \sum_D p(G)p(D|G)p(B|D) \\
+p(G,B|m_{co}) & = & p(G)p(B)
 \end{eqnarray*}
 
 We do not actually know the terms on the right side of those
@@ -146,111 +174,68 @@ rewrite the equations as:
 
 
 \begin{multline*}
-  p(A,C|m_{ch}) = \\
-  \int \left ( \sum_B p(A|\theta) p(B|A,\theta) 
-  p(C|B,\theta) \right ) p(\theta) d\theta \\
-  p(A,C|m_{co}) = \int p(A|\theta)p(C|\theta)p(\theta) d\theta
+  p(G,B|m_{ch}) = \\
+  \int \left ( \sum_D p(G|\theta) p(D|G,\theta) 
+  p(B|D,\theta) \right ) p(\theta) d\theta \\
+  p(G,B|m_{co}) = \int p(G|\theta)p(B|\theta)p(\theta) d\theta
 \end{multline*}
 
 We can learn $p(\theta)$ from available data using dirichlet priors.
 The integrals would be difficult algebraically, but they can be
 adequately approximated with monte-carlo sampling.
 
-Once we have these, let $n_{a,c}$ be the count of datapoints with
-A=a,C=c and we can use:
+Once we have these, let $n_{g,b}$ be the count of datapoints with
+G=g,B=b and we can use:
 
 \begin{equation*}
-p(n_*|m) \propto \prod_{a,c} p(a,c|m)^{n_{a,c}}
+p(n_*|m) \propto \prod_{g,b} p(g,b|m)^{n_{g,b}}
 \end{equation*}
 
-Proportional instead of equal because there is a combinatoric term,
+This is proportional instead of equal because there is a combinatoric term,
 but it cancels when taking odds ratios so it can be safely ignored.
-
-From here, we can apply standard bayesian updating.  Empirically, this
-works well.  With all probabilities chosen at random, the mean log
-probability it assigns to the wrong model is only -0.62.  Furthermore,
-if the output is bucketed by posterior, the fraction correct forms a
-graph very similar to a straight line (see figure \ref{dir_pla58}).
-It does show a minor bias toward chain models, but it goes away at the
-edges, and collider models are the useful ones, so this is a safe bias.
-
-While the test is well-calibrated, it returns bayes factors very close
-to one most of the time.  For random probabilities and 58 datapoints,
-it only gives a clear answer (i.e. a bayes factor outside the range
-[0.1,10] 8\% of the time).  This includes cases in which one of the
-causal effects is very weak.  Altering the generative function to more
-closely resemble the Crohn's data (by having the real p(NOD2) and
-p(Crohn's$|$NOD2) and detectable $B\not\indep C$) brings this up to
-13\%.  Even with realistic data, 500 datapoints are needed to gain
-conclusive answers more than half the time (see figure
-\ref{dir_use}).  The realistic data does make the test somewhat less
-calibrated (figure \ref{dir_crohns58}), which probably reflects a
-collide model being more likely to produce Crohns-like data in the
-first place, but the errors remain small and on the side of safety.
+From here, we can apply standard bayesian updating.
 
 \subsection{Non-Simply-Connected Graphs}
 
-What if there is a causal effect $A\rightarrow C$?  It must be weak
+What if there is a causal effect $G\rightarrow B$?  It must be weak
 enough not to be detected, but that doesn't say much.  Let us consider
 it by cases.
 
 \subsubsection{False Colliders}
 
 Can a true graph of
-$A\tikzmark{a}\rightarrow B \rightarrow{C}\tikzmark{c}$
+$G\tikzmark{a}\rightarrow D \rightarrow{B}\tikzmark{c}$
 \underarrow{a}{c}
-produce a $p(A,C)$ more similar to a graph
-$A \rightarrow B \leftarrow C$?  This would require the direct and
-indirect influence of $A$ on $C$ to cancel out rather precisely.  If
+produce a $p(G,B)$ more similar to a graph
+$G \rightarrow D \leftarrow B$?  This would require the direct and
+indirect influence of $G$ on $B$ to cancel out rather precisely.  If
 the indirect influence is stronger, we will pick the correct model,
 albeit underconfidently.  If the direct influence is too strong, we
-will see a correlation between $A$ and $C$.  And if the direct
+will see a correlation between $G$ and $B$.  And if the direct
 influence is in the same direction as the indirect, the correct model
 will remain the better fit (though both models will be worse).
 
 \subsubsection{False Chains}
 
 Similarly, can a true graph of
-$A\tikzmark{a2}\rightarrow B \leftarrow{C}\tikzmark{c2}$
+$G\tikzmark{a2}\rightarrow D \leftarrow{B}\tikzmark{c2}$
 \underarrow{a2}{c2}
-produce a $p(A,C)$ more similar to a graph
-$A \rightarrow B \rightarrow C$?  Again, this is possible, but there
-is no reason for $p(C|A)$ to resemble $\sum_B p(B|A)p(C|B)$.  If
-$p(C|A)-p(C|\bar{A})$ is too large, $A\not\indep C$ will be detected
+produce a $p(G,B)$ more similar to a graph
+$G \rightarrow D \rightarrow B$?  Again, this is possible, but there
+is no reason for $p(B|G)$ to resemble $\sum_D p(B|D)p(D|G)$.  If
+$p(B|G)-p(B|\bar{G})$ is too large, $G\not\indep B$ will be detected
 initially, whereas if it's too small, the correct model will be
 chosen.  Furthermore, what shrinks the upper bound is for the
-predicted A-C relation in the chain model to be small, which also
+predicted $G-B$ relation in the chain model to be small, which also
 means any erroneous bayes factor will be small.
-
-\subsubsection{Empirical Examination}
-
-These examinations are difficult to make rigorous, but simulation
-suggests there is little to worry about.  If an $A\rightarrow C$ link
-is added but bounded by a $\chi^2$ test, there is a tendency toward
-underconfidence, but little other effect (see figure
-\ref{dir_multi58}.  This applies to the Crohns-like case, and does not
-fully generalize.
-
-Overall, this technique is not \textit{brittle} in the face of an
-$A \rightarrow C$ link, but it is not robust against an arbitrarily
-strong one either.  Domain knowledge or other tools must be used to
-establish safety.  In the case of Crohn's disease, the generally
-understood role of NOD2, mediates \textit{untargetted} immune
-responses, makes an $A\rightarrow C$ link unlikely [\cite{nod2}].
 
 \subsection{Unobserved Confounders}
 
 This technique is vulnerable to confounders.  Specifically, if the
-$B-C$ link is the product of a common cause, that will generate no
-$A-C$ dependence, exactly like a collider.
-
-\subsection{Building a Graph}
-
-This technique may be iterated to expand a graph, though whether it
-will suffice to describe an entire graph depends on the specifics.
-Since it does offer bayes factors, these can be used in the iteration,
-and provide a metric of when one has extrapolated too far from too
-little domain knowledge.
+$D-B$ link is the product of a common cause, that will generate no
+$G-B$ dependence, exactly like a collider.  That is, it will suggest
+we ought to use that bacterium as a treatment, though in fact doing so
+would be ineffective.
 
 \section{Severing}
 
@@ -260,9 +245,9 @@ impossible for a formula to say that $A\not\indep B$ in full
 generality, but it may be possible to say $A\not\indep B|S$
 sufficiently for our purposes.
 
-Suppose A, B and S are already known to correlate.  The simplest
-associated models are S-A-B, A-S-B and A-B-S, where S severs only in
-the A-S-B case (the directions on the arrows are not important at the
+Suppose $A$, $B$ and $S$ are variables already known to correlate.  The simplest
+associated models are $S-A-B$, $A-S-B$ and $A-B-S$, where $S$ severs only in
+the $A-S-B$ case (the directions on the arrows are not important at the
 moment, except that there can be no colliders).  For the first two
 models:
 
@@ -274,12 +259,12 @@ models:
 And there is a symmetric formula for the last one.  Since there are
 two alternative hypotheses, we take whichever produces the greater
 probability.  Somewhat surprisingly, there is no advantage here in
-using monte-carlo posteriors of simple maximum likelihood estimators
+using monte-carlo posteriors instead of simple maximum likelihood estimators
 for the conditional probabilities.
 
 There is another simple causal graph that can cause three variables to
 correlate: all could be influenced by a common confounder $H$ (for
-``hidden).  This case is impossible to test for in full generality,
+``hidden'').  This case is impossible to test for in full generality,
 because $S$ could follow $H$ so closely as to be an acceptable proxy,
 and therefore controlling for $S$ effectively controls for $H$.  In
 theory, it should be possible to infer $H$ and its conditionals usings
@@ -288,36 +273,30 @@ overfit this more complex model and no straightforward way to
 compensate.  What does work surprisingly well is to ignore this case
 and apply the exact same test as before.
 
-Empirically, severing vs. chain has mean log p(false) of -.41 and
-vs. common cause has of -.49.  Both follow close to a straight line
-(see figure \ref{sever}).
-
 \subsection{Applying Severing}
 
 If we are willing to trust the severing test, can we use it to find
 causes of a variable of interest?  Deducing the entire causal graph
 is a brittle endevour, but there is a local solution.
 
-Suppose there exist three variable with a common cause, such that one
-causes the variable of interest, that is $H\tikzmark{h} \rightarrow A
-\rightarrow D \; B\tikzmark{b3} \; C\tikzmark{c3}$ \underarrow{h}{b3}
-\underarrow{h}{c3}.  The trio $A,B,C$ can be identified because they
+Suppose there exist three variable (bacteria) with a common (hidden) cause,
+such that one causes the variable of interest (disease), that is
+$H\tikzmark{h} \rightarrow B_1 \rightarrow D \; B_2\tikzmark{b3} \;
+B_3\tikzmark{c3}$ \underarrow{h}{b3} \underarrow{h}{c3}.  The trio
+$B_{1,2,3}$ can be identified because they
 all correlate and remain correlated when controlling for any of them.
 No special test is needed for this, standard $\chi^2$ can produce a p
-value for all of this.  The role of $A$ can be identified because it
-severs $B$ and $C$ from $D$ (standing for ``disease'', remembering the
-application).  No other simply connected graph has these properties.
+value for all of this.  The role of $B_1$ can be identified because it
+severs $B_2$ and $B_3$ from $D$.  No other simply connected graph has
+these properties.
 
-This technique does not try to find \textit{all} causes of $D$, only
-those which happen to fit this motif and are strong enough for a
-$\chi^2$ test to pick up.  As such, it is unclear what it would mean
-to test it in simulation.  Certainly with parameters chosen for the
-purpose, it will work.  With random parameters, it will generally fail
-to find trios.
+Note that this does not attempt to find \textit{all} causes of $D$,
+only those for which suitable $H$, $B_2$ and $B_3$ exist.
 
 \subsection{Unobserved Confounders}
 
-If the links between $H$ and $A,B,C$ in the preceeding graph are
+This technique is robust against unobserved confounders.  If the links
+between $H$ and $B_{1-3}$ in the preceding graph are
 actually mutual effect from a confounder, then that confounder can be
 thought of as a part of $H$ (which is itself unobserved).  If the link
 between $A$ and $D$ is via confounder, then there will be no $B-D$ or
@@ -340,12 +319,68 @@ of a link which is a statement about the world.
 
 From a biochemical perspective, they are.  Each link asserts an
 interaction, and the default for organic molecules or micro-organisms
-is not to interact with eachother.  As for unobserved confounders, the
+is not to interact with each other.  As for unobserved confounders, the
 presence of unobserved variables in biology is a given, but for them
 to be confounders requires \textit{two} interactions that relate to
-eachother.
+each other.
 
 Fields other than biology will need to reconsider this.
+
+\section{Testing in Simulation}
+
+\subsection{Graph Extending}
+
+Empirically, this
+works well.  With all probabilities chosen at random, the mean log
+probability it assigns to the wrong model is only -0.62.  Furthermore,
+if the output is bucketed by posterior, the fraction correct forms a
+graph very similar to a straight line (see figure \ref{dir_pla58}).
+It does show a minor bias toward chain models, but it goes away at the
+edges, and collider models are the useful ones, so this is a safe bias.
+
+While the test is well-calibrated, it returns bayes factors very close
+to one most of the time.  For random probabilities and 58 datapoints,
+it only gives a clear answer (i.e. a bayes factor outside the range
+[0.1,10] 8\% of the time).  This includes cases in which one of the
+causal effects is very weak.  Altering the generative function to more
+closely resemble the Crohn's data (by having the real p(NOD2) and
+p(Crohn's$|$NOD2) and detectable $B\not\indep C$) brings this up to
+13\%.  Even with realistic data, 500 datapoints are needed to gain
+conclusive answers more than half the time (see figure
+\ref{dir_use}).  The realistic data does make the test somewhat less
+calibrated (figure \ref{dir_crohns58}), which probably reflects a
+collide model being more likely to produce Crohns-like data in the
+first place, but the errors remain small and on the side of safety.
+
+\subsubsection{Non-Simply-Connected Graphs}
+
+These examinations are difficult to make rigorous, but simulation
+suggests there is little to worry about.  If an $A\rightarrow C$ link
+is added but bounded by a $\chi^2$ test, there is a tendency toward
+underconfidence, but little other effect (see figure
+\ref{dir_multi58}.  This applies to the Crohns-like case, and does not
+fully generalize.
+
+Overall, this technique is not \textit{brittle} in the face of an
+$A \rightarrow C$ link, but it is not robust against an arbitrarily
+strong one either.  Domain knowledge or other tools must be used to
+establish safety.  In the case of Crohn's disease, the generally
+understood role of NOD2 as mediating \textit{untargetted} immune
+responses, makes an $A\rightarrow C$ link unlikely [\cite{nod2}].
+
+\subsection{Severing}
+
+Empirically, severing vs. chain has mean log p(false) of -.41 and
+vs. common cause has of -.49.  Both follow close to a straight line
+(see figure \ref{sever}).
+
+The applied severing technique does not try to find \textit{all}
+causes of $D$, only
+those which happen to fit this motif and are strong enough for a
+$\chi^2$ test to pick up.  As such, it is unclear what it would mean
+to test it in simulation.  Certainly with parameters chosen for the
+purpose, it will work.  With random parameters, it will generally fail
+to find trios.
 
 \section{Crohn's Disease}
 
