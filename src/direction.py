@@ -85,7 +85,7 @@ def montecarlo(cause, effect, unknown, n, *ignore):
     sumarr(cnt_unknown, 0.1)
     sumarr(cnt_effect_unknown, 0.1)
     cnt_cause_unknown = count(zip(cause, unknown))
-    rounds = 100
+    rounds = 500
     p_overall = struct(cause_unknown_chain=[[0,0],[0,0]],
                        cause_unknown_collide=[[0,0],[0,0]])
     for i in range(rounds):
