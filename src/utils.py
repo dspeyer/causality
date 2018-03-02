@@ -324,3 +324,11 @@ def any(l, cond):
                 return True
         return False
     return cond(l)
+
+def format2(x):
+    if x<0.1:
+        return '%.1g' % x
+    elif x<10:
+        return '%.1f' % x
+    else:
+        return '%d' % x

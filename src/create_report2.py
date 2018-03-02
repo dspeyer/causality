@@ -9,6 +9,8 @@ from math import log
 from sys import stdout, argv
 import direction, severs
 from common_cause import has_common_cause
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 data = Data()
@@ -67,6 +69,21 @@ if '-histogram' in argv:
 #        print '%.2f, %.2f, %d' % (exp((i-1-half_n_buckets)*bs), exp((i-half_n_buckets)*bs), v)
         print '%.2f, ' % (exp((i-1-half_n_buckets)*bs))
         print '%.2f, %d' % (exp((i-.5-half_n_buckets)*bs), v)
+    ind = np.array(range(len(buckets)))
+    labels = np.exp((ind-1-half_n_buckets)*bs)
+    ind1 = np.argmin(np.abs(labels-1)) - 0.05
+    labels = [format2(x) for x in labels]
+    yheight = np.ceil(max(buckets)/5.0)*5
+    fig, ax = plt.subplots()
+    plt.bar(range(len(buckets)), buckets,
+            align='edge')
+    ax.set_xticks(ind)
+    ax.set_xticklabels(labels)
+    plt.plot([ind1,ind1],[0,yheight],'r-', linewidth=2)
+    plt.xlabel('Bayes Factor')
+    plt.ylabel('Number of Species')
+    plt.savefig('histogram.eps')
+    print 'created histogram as histogram.eps'
 
 if '-trio' in argv:
     for s1 in interesting:
