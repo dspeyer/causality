@@ -94,8 +94,7 @@ expression of confidence which becomes ``I don't know'' when the data
 gets too small.  This solution has another benefit: in the biomedical
 context, it is routine to test thousands of equally plausible
 hypotheses at once.  A flat accuracy of 99\% is unhelpful in the face
-of this, but a numeric expression of confidence allows proper
-compensation.
+of this, but a calibrated bayes factor allows compensation.
 
 Traditional inference algorithms such as [\cite{Pearl}] generally
 construct the entire DAG by a series of logical deductions that depend
@@ -131,14 +130,15 @@ variables, make exhaustive RCTs impractical.
 
 Data is available on this problem from [\cite{data}], including
 genetic, microbiome and
-health information, but for only 58 patients.  The microbiome
+health information, but for only 58 patients (plus another 24 with
+microbiome and health information, but not genetic).  The microbiome
 information is a series of 16S reads, but can generally be described
 as ``present'' or ``absent'', with very low concentrations of a
 species rounded off to ``absent''.  This comes much closer to fitting
 the empirical distributions than any simple scalar formula, which is
 why this paper uses binary variables.
 
-\section{Extending Graphs}
+\section{Collider Finding}
 
 Let us begin with the simplest case.  Suppose we have a known cause, a
 known effect, and a variable which connects to the effect in an
@@ -195,6 +195,39 @@ This is proportional instead of equal because there is a combinatoric term,
 but it cancels when taking odds ratios so it can be safely ignored.
 From here, we can apply standard bayesian updating.
 
+\subsection{Without a Known Cause}
+
+Suppose we do not have a link of known direction.  If we can find two
+variables $B_1$ and $B_2$ such that both correlate to $D$ but not to
+each other, then the only simple causal graph that could generate this
+is $B_1 \rightarrow D \leftarrow B_2$.  This finds two causes.
+
+Just as we looked at $p(G,B)$ in the previous case, here we look at
+$p(B_1,B_2)$.  The competing hypothesis $B_1 \rightarrow D \rightarrow
+B_2$ is the same as before, but we must now consider $B_1 \leftarrow D
+\rightarrow B_2$ (let us call this the ``V'' model).  In fact, we can
+use the exact same formula:
+
+\begin{eqnarray*}
+  p(B_1,B_2|m_v)
+  & = & \sum_D p(B_1|D)p(B_2|D)p(D) \\
+  & = & \sum_D \frac{p(B_1,D)}{p(D)}\frac{p(B_2,D)}{p(D)}p(D) \\
+  & = & \sum_D \frac{p(B_1,D)p(B_2,D)}{p(D)} \\
+  & = & \sum_D \frac{p(B_1)}{p(B_1)}\frac{p(D,B_1)}{1}\frac{p(B_2,D)}{p(D)} \\
+  & = & \sum_D p(B_1)p(D|B_1)p(B_2|D) \\
+  & = & p(B_1,B_2|m_{ch})
+\end{eqnarray*}
+
+There is also the possiblity of $B_1\rightarrow B_2 \rightarrow D$,
+but in this case the $B_1-B_2$ link will be stronger than the $B_1-D$
+link, so there is no risk of a false collider.
+
+There is also the possibility of non-simple-connectedness.  For
+boolean $D$, if there are many variable $B_{1..n}$ that strongly
+influence it, they \textit{must} correlate to each other.  Otherwise
+they would be responsible for more than all of the variation in $D$.
+Fortunately, the common case here will result in false negatives.
+
 \subsection{Non-Simply-Connected Graphs}
 
 What if there is a causal effect $G\rightarrow B$?  It must be weak
@@ -237,10 +270,15 @@ $G-B$ dependence, exactly like a collider.  That is, it will suggest
 we ought to use that bacterium as a treatment, though in fact doing so
 would be ineffective.
 
-\section{Severing}
+This risk is increased by using a two-bacterium approach, as
+\textit{either} link being the result of a confounder invalidates our
+conclusions about both links.
 
-Suppose we do not have a known causal effect to expand from.  The
-standard oracle-requiring algorithms do not need one.  It is probably
+\section{D-Separation}
+
+Ideally, we'd like to answer questions of the form
+$A\overset{?}{\indep}B|S$, not just find individual colliders.
+It is probably
 impossible for a formula to say that $A\not\indep B$ in full
 generality, but it may be possible to say $A\not\indep B|S$
 sufficiently for our purposes.
@@ -273,9 +311,9 @@ overfit this more complex model and no straightforward way to
 compensate.  What does work surprisingly well is to ignore this case
 and apply the exact same test as before.
 
-\subsection{Applying Severing}
+\subsection{Applying D-Separation}
 
-If we are willing to trust the severing test, can we use it to find
+If we are willing to trust the d-separation test, can we use it to find
 causes of a variable of interest?  Deducing the entire causal graph
 is a brittle endevour, but there is a local solution.
 
@@ -293,18 +331,32 @@ these properties.
 Note that this does not attempt to find \textit{all} causes of $D$,
 only those for which suitable $H$, $B_2$ and $B_3$ exist.
 
+\subsubsection{Application to Genomic Studies}
+
+The causal graph mentioned above is a common one in genome-wide
+association studies, where the hidden factor is population structure,
+the three correlating variables are genetic features and the variable
+of interest is a phenotype.  The goal, once again, is to determine
+\textit{which} generic feature directly affects the phenotype.  One
+answer is that it is the one which best separates the others from the
+phenotype, and that this can be measured with the same formulas as
+here.
+
+Whether this will produce useful results in practice is a question for
+a later study.
+
 \subsection{Unobserved Confounders}
 
 This technique is robust against unobserved confounders.  If the links
 between $H$ and $B_{1-3}$ in the preceding graph are
 actually mutual effect from a confounder, then that confounder can be
 thought of as a part of $H$ (which is itself unobserved).  If the link
-between $A$ and $D$ is via confounder, then there will be no $B-D$ or
-$C-D$ link to sever.
+between $B_1$ and $D$ is via confounder, then there will be no
+$B_{2,3}-D$ correlations to seperate.
 
 \subsection{Non-Simply-Connected Graphs}
 
-These techniques depend on simply-connected graphs.  Both the severing
+These techniques depend on simply-connected graphs.  Both the d-separation
 test and its application can say nothing of significance in the face
 of multiple connections.
 
@@ -328,162 +380,40 @@ Fields other than biology will need to reconsider this.
 
 \section{Testing in Simulation}
 
-\subsection{Graph Extending}
-
-Empirically, this
-works well.  With all probabilities chosen at random, the mean log
-probability it assigns to the wrong model is only -0.62.  Furthermore,
-if the output is bucketed by posterior, the fraction correct forms a
-graph very similar to a straight line (see figure \ref{dir_pla58}).
-It does show a minor bias toward chain models, but it goes away at the
-edges, and collider models are the useful ones, so this is a safe bias.
-
-While the test is well-calibrated, it returns bayes factors very close
-to one most of the time.  For random probabilities and 58 datapoints,
-it only gives a clear answer (i.e. a bayes factor outside the range
-[0.1,10] 8\% of the time).  This includes cases in which one of the
-causal effects is very weak.  Altering the generative function to more
-closely resemble the Crohn's data (by having the real p(NOD2) and
-p(Crohn's$|$NOD2) and detectable $B\not\indep C$) brings this up to
-13\%.  Even with realistic data, 500 datapoints are needed to gain
-conclusive answers more than half the time (see figure
-\ref{dir_use}).  The realistic data does make the test somewhat less
-calibrated (figure \ref{dir_crohns58}), which probably reflects a
-collide model being more likely to produce Crohns-like data in the
-first place, but the errors remain small and on the side of safety.
-
-\subsubsection{Non-Simply-Connected Graphs}
-
-These examinations are difficult to make rigorous, but simulation
-suggests there is little to worry about.  If an $A\rightarrow C$ link
-is added but bounded by a $\chi^2$ test, there is a tendency toward
-underconfidence, but little other effect (see figure
-\ref{dir_multi58}.  This applies to the Crohns-like case, and does not
-fully generalize.
-
-Overall, this technique is not \textit{brittle} in the face of an
-$A \rightarrow C$ link, but it is not robust against an arbitrarily
-strong one either.  Domain knowledge or other tools must be used to
-establish safety.  In the case of Crohn's disease, the generally
-understood role of NOD2 as mediating \textit{untargetted} immune
-responses, makes an $A\rightarrow C$ link unlikely [\cite{nod2}].
-
-\subsection{Severing}
-
-Empirically, severing vs. chain has mean log p(false) of -.41 and
-vs. common cause has of -.49.  Both follow close to a straight line
-(see figure \ref{sever}).
-
-The applied severing technique does not try to find \textit{all}
-causes of $D$, only
-those which happen to fit this motif and are strong enough for a
-$\chi^2$ test to pick up.  As such, it is unclear what it would mean
-to test it in simulation.  Certainly with parameters chosen for the
-purpose, it will work.  With random parameters, it will generally fail
-to find trios.
-
-\section{Crohn's Disease}
-
-Returning to the original motivating problem, what do these techniques
-show for Crohn's Disease?
-
-The bacterial concentrations can be converted to boolean values by
-placing thresholds on them.  For each species, a threshold was chosen that
-maximized the number of Crohn's Disease statuses that could be
-correctly predicted by that bacterium alone.  These boolean values can
-then be thought of as ``has a clinically relevant dosage of the
-bacterium''.  Once the values were booleanized, all those with
-entropies less than 0.5 were dropped on the logic that a species
-that's always the same can't have a clinical effect.  This left 222
-species.
-
-Of these the direction technique found 8 which show signs of impacting
-Crohn's Disease, though only one (Lactobacillus acidophilus) has a
-bayes factor greater than 10.  The 8 are shown in figure \ref{dir_tab}.
-
-Inconveniently, that species appears to
-be \textit{harmful}, which is surprising given the usual role of
-lactobacilli but less so given that two RCTs found this same result
-(albeit nonsignificantly) [\cite{lgg1,lgg2}].  It may be relevant that
-L. acidophilus is usually found in the
-\textit{jejunum} [\cite{lacid}], but these samples are from
-\textit{ileum} biopsies.  Perhaps the cause of Crohn's Disease is not
-which bacteria are in the intestine, but where in the intestine they
-are.  This result is inconvenient because removing or moving bacteria
-is far more difficult than adding them.
-
-The severing test offers more possible species (see figure
-\ref{sev_tab}).  The bayes factors are higher, but the overall
-complexity of the test is reason to be nervous.  This test also took
-extremely long to run, which may require fixing before it can be used
-seriously.
-
-The species without strong bayes factors are still encouraging.  The
-p-value confirms they relate to Crohn's Disease in some way, in which
-case ``causes'' and ``is caused by'' are the most likely models by
-simple priors.  These small values bump our posterior belief some.
-This is not enough to recommend to patients, but it is a better place
-to start RCTs than anything we had before.
-
-\newpage
-
-\printbibliography
-
-\newpage
-\onecolumn
-\section{Figures}
-
-\begin{figure}[h!]
-  \includegraphics[width=\textwidth]{nonnormal}
-  \caption{Histogram of representative interesting bacterial species.
-    The fractions are rounded up before taking logs to avoid log(0).
-    These could be approximated as normal, albeit not especially well,
-    were it not for the giant spikes on the left.  Perhaps a compound
-    model would be possible, but so many degrees of freedom become
-    tricky to work with.}
-  \label{nonnormal}
-\end{figure}
+\begin{figure}[b!]
+  \includegraphics[width=.5\textwidth]{test_direction_uni}
+  \caption{Simulated data using 100k chain and collide models, each
+    generating 58 datapoints.
+    Higher numbers indicate collider.  Blue squares indicate
+    parameters drawn from a flat distribution.  Purple Xs indicate the
+    same, except discerning colliders from v models instead of
+    chains. Red diamonds indicate a
+    Crohn's-like distribution ($p(G)$ and $p(D|G)$ taken from
+    data; $G\indep B$ and $D\not\indep B$ `shown' by $\chi^2$ test,
+    $p>0.1$ and $p<0.01$ respectively).  Open green diamonds indicate
+    the same, except with a $G\rightarrow B$ link in the true causal
+    model (still $p>0.1$).}
   
-\begin{figure}
-  \includegraphics[width=\textwidth]{direction_platonic_58}
-  \caption{Simulated data using 10k each chain and collide models with
-    flatly random parameters, using 0.05-sized buckets for the
-    posterior.  Higher numbers indicate collider.}
   \label{dir_pla58}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=\textwidth]{usefullness}
+  \includegraphics[width=.5\textwidth]{usefullness}
   \caption{Fraction of bayes factors that were at least 10:1 one way
-    or the other as a function of dataset size}
+    or the other as a function of dataset size, for the
+    collider-detection test.}
   \label{dir_use}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=\textwidth]{direction_crohns_58}
-  \caption{The same simulation as \ref{dir_pla58}, but with p(NOD2) and
-    p(ICD$|$NOD2) taken from data, and the independences measurable by
-    $\chi^2$ test.}
-  \label{dir_crohns58}
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{direction_multi_58}
-  \caption{The same simulation as \ref{dir_crohns58}, but with
-    allowing an $A\rightarrow C$ causal link, albeit one which does
-    not show up as $A\not\indep C$ on a $\chi^2$ test.}
-  \label{dir_multi58}
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{sever}
-  \caption{Calibration for the severing test, both in the case it was
+  \includegraphics[width=.5\textwidth]{sever}
+  \caption{Calibration for the d-separation test, both in the case it was
     designed for and in the case of comparing severing to common
-    cause.  Higher probabilities indicate severing.}
+    cause.  Higher probabilities indicate separation.}
   \label{sever}
 \end{figure}
 
-\begin{figure}
+\begin{figure*}
   \begin{tabular}{llrr}
     Species & Sick When & P-Value ICD link & Bayes Factor Causality \\
     Streptococcus pseudopneumoniae & $>$6.36E-05 & 3.1e-05 & 5.15 \\
@@ -499,9 +429,30 @@ to start RCTs than anything we had before.
     direction test described here to establish that it causes (or
     prevents) the disease.}
   \label{dir_tab}
-\end{figure}
+\end{figure*}
 
-\begin{figure}
+\begin{figure*}[b]
+  \begin{tabular}{llllllr}
+Species 1 & Sick When & p.v. & Species 2 & Sick When & p.v. & B.F \\
+    Lawsonia intracellularis & $\leq1.3\mathrm{e}{-4}$ & $0.004$ & Sporobacter termitidis & $\leq2.5\mathrm{e}{-4}$ & $4\mathrm{e}{-6}$ & 4.5 \\
+Anoxybacillus thermarum & present & $1\mathrm{e}{-6}$ & Ruminococcus albus & $\leq1.2\mathrm{e}{-4}$ & $0.004$ & 4.5 \\
+Hespellia stercorisuis & $\leq9.9\mathrm{e}{-5}$ & $0.002$ & Ralstonia solanacearum & $\leq1.7\mathrm{e}{-2}$ & $0.004$ & 4.4 \\
+Clostridium xylanolyticum & $\leq1.2\mathrm{e}{-3}$ & $0.001$ & Ralstonia solanacearum & $\leq1.7\mathrm{e}{-2}$ & $0.004$ & 4.2 \\
+Anoxybacillus flavithermus & $>1.7\mathrm{e}{-4}$ & $1\mathrm{e}{-6}$ & Eubacterium siraeum & $\leq9.9\mathrm{e}{-5}$ & $0.0002$ & 4.1 \\
+Anoxybacillus thermarum & present & $1\mathrm{e}{-6}$ & Coprococcus eutactus & $\leq1.6\mathrm{e}{-4}$ & $0.0002$ & 5.9 \\
+Anoxybacillus flavithermus & $>1.7\mathrm{e}{-4}$ & $1\mathrm{e}{-6}$ & Coprococcus eutactus & $\leq1.6\mathrm{e}{-4}$ & $0.0002$ & 5.3 \\
+Anoxybacillus kamchatkensis & present & $3\mathrm{e}{-5}$ & Gemmiger formicilis & $\leq8.7\mathrm{e}{-4}$ & $5\mathrm{e}{-6}$ & 8.5 \\
+  \end{tabular}
+  \caption{Results of collider-search looking for pairs of bacteria.
+    The ``sick when''  column indicates when that species is
+    associated with disease and the ``p.v.'' column the p-value
+    showing that association ($\chi^2$ test).  The ``B.F.'' column
+    gives the bayes factor for the collider model as opposed to chain
+    or v.}
+  \label{two_bact_tab}
+\end{figure*}
+
+\begin{figure*}
   \begin{tabular}{llllr}
     Species & Sick When & Severs & Third in Trio & Bayes Factor \\
     Coprococcus catus & $\leq$2.67E-04 & B intestinihominis & O splanchnicus & 33.34 \\
@@ -521,6 +472,157 @@ Sporobacter termitidis & $\leq$2.47E-04 & E ruminantium & T forsythia & 106.95 \
     with disease until the first is controlled for, and the third is a
     third with a common cause.}
   \label{sev_tab}
-\end{figure}
+\end{figure*}
+
+To test these tools, we created causal networks with the structures we
+sought to distinguish, filling in the parameters at random.  Then we
+used each net to create a dataset, and used the dataset to infer the
+shape of the net.  We used the fraction of nets of each shape as a
+prior and used that to convert the bayes factor into a posterior,
+which we compared to the true shape of the net.
+
+We calculated the mean log error, that is, we took the probability the
+system assigned to the correct shape, took its negative natural log,
+and took the mean of those over all generated nets.  Always being
+certain and correct would be an error of 0, whereas ever being certain
+and wrong would be an error of infinity.
+
+We also drew calibration graphs.  For these, we gathered test nets by
+their posteriors (in buckets 5 percentage points wide) and calculated
+the actual percentage of each shape for nets in a bucket.  A perfectly
+calibrated test is one such that of all the nets it assigns a 85\%
+probability of being colliders, 85\% of them actually are.
+
+\subsection{Collider Detection}
+
+This test is well-calibrated over random parameters, as shown by
+figure \ref{dir_pla58}, but with only 58 datapoints, the vast majority
+of nets return bayes factors close to 1.  Only 8\% of nets produce
+bayes factors outside the [0.1, 10] range.  The average log error is
+0.62, roughly the same as if it had returned a posterior of 0.5 for
+everything.
+
+This is not terribly surprising.  58 datapoints is not very much
+data.  Any statistical test would be hard-pressed to report useful
+conclusions from that except in the presence of strong trends, which
+randomly-drawn parameters rarely produce.  That the test correctly
+identifies what it does not know is good, but not very useful.
+
+Increasing the size of the dataset helps (see figure \ref{dir_use}).
+At 1000 datapoints, 38\% of results are outside that range, and the
+average log error drops to 0.42. Obtaining 1000s patients'
+microbiome data might be expensive (though dropping rapidly, as
+direct-to-consumer microbiome sequencing becomes available), but
+obtaining similar epidemiological data is common.
+
+We also tested this using data more similar to the Crohn's Disease
+dataset.  We generated nets using real-world $p(G)$ and $p(D|G)$ with
+random bacterial parameters.  Then we filtered them to only include
+nets where $B \not\indep D$ was detectable by $\chi^2$ test $p<0.01$,
+and to not include any where $G \not\indep B$ was detectable by
+$\chi^2$ test $p<0.1$.  The 
+former is a test we would apply anyway (it is not useful to determine
+causality of a link that may not exist!) and the latter is a cheap
+test that does not rule out a significant number of species.  The
+calibration is slightly worse as judged by the graph, though average
+log loss is lower 0.59 at 58 datapoints, 0.23 at 1000, and the
+tendency to produce useful results increases by almost a factor of 2.
+This is because the Crohn's-like generation rules out several
+scenarios about which nothing useful can be said, such a too-weak
+$B-D$ link, or a $p(G)$ so high or low that the other case cannot be
+analyzed.
+
+Finally, we tested the system using nets that have a $G\rightarrow B$
+link, albeit one that cannot be detected by $\chi^2$ test
+($p\not<0.1$).  As expected, this produced a moderate general trend to
+underconfidence, but still a mostly well-calibrated result.
+
+In every case, the error at the high end was in the direction of
+underconfidence.  As the high end corresponds to clinical
+applicability, this means that we will occasionally miss an effective
+therapy that an ideal algorithm would have found, but we will not
+claim an ineffective therapy is effective (any more than normal
+uncertainty requires).
+
+
+\subsection{D-Separation}
+
+The d-separation test has mean log loss of 0.41 when comparing a
+separator to a chain (that is, $A-S-B$ vs $A-B-S$) and 0.49 when
+comparing to a common, hidden cause ($A-S-B$ vs $H-A,B,S$).  Both
+follow close to a straight line (see figure \ref{sever}).
+
+The applied severing technique does not try to find \textit{all}
+causes of $D$, only
+those which happen to fit this motif and are strong enough for a
+$\chi^2$ test to pick up.  As such, it is unclear what it would mean
+to test it in simulation.  Certainly with parameters chosen for the
+purpose, it will work.  With random parameters, it will generally fail
+to find trios.
+
+\section{Crohn's Disease}
+
+Returning to the original motivating problem, what do these techniques
+show for Crohn's Disease?
+
+First we converted the lists of reads into boolean
+values.  We converted each read to a species names using BLAST [\cite{BLAST}]
+and the 16S Microbial database [\cite{16S}].  For each read, we
+selected the highest-matching species (an imperfect, but unbiased
+technique) and dropped all reads without matches.  We divided by total
+reads to get a concentration.  For each species, we chose a threshold that
+maximized the number of Crohn's Disease statuses that could be
+correctly predicted by that bacterium alone.  Finally, we compared the
+concentrations to the thresholds to produce boolean values. These
+boolean values can then be thought of as ``has a clinically relevant
+dosage of the bacterium''.
+
+Once the values were booleanized, all those with
+entropies less than 0.5 were dropped on the logic that a species
+that's always the same can't have a clinical effect.  This left 222
+species, of which 61 showed correlation to Crohn's Disease $(p<0.01)$
+and did not show correlation to NOD2 $(p\cancel{<}0.1)$.
+
+Of these the collider-finding test against the NOD2 gene found 8 which
+show signs of impacting
+Crohn's Disease, though only one (Lactobacillus acidophilus) has a
+bayes factor greater than 10.  The 8 are shown in figure \ref{dir_tab}.
+
+Inconveniently, that species appears to
+be \textit{harmful}, which is surprising given the usual role of
+lactobacilli but less so given that two RCTs found this same result
+(albeit nonsignificantly) [\cite{lgg1,lgg2}].  It may be relevant that
+L. acidophilus is usually found in the
+\textit{jejunum} [\cite{lacid}], but these samples are from
+\textit{ileum} biopsies.  Perhaps the cause of Crohn's Disease is not
+which bacteria are in the intestine, but where in the intestine they
+are.  This result is inconvenient because removing or moving bacteria
+is far more difficult than adding them.
+
+Could this be the result of a direct $G\rightarrow B$ link?  In this
+case, the generally
+understood role of NOD2 as mediating \textit{untargetted} immune
+responses [\cite{nod2}], makes that unlikely.
+
+Looking for two-bacterium colliders, we find 8 pairs with bayes
+factors above 4, containing 13 species (3 of them twice).  This is
+shown in figure \ref{two_bact_tab}.  To a degree, the number of pairs
+we did \textit{not} find is disturbing, but the number of strongly
+causal species means there \textit{must} be hidden common causes.
+
+The d-separation three-species test offers more possible species (see figure
+\ref{sev_tab}).  The bayes factors are higher, but the overall
+complexity of the test is reason to be nervous.  This test also took
+extremely long to run, which may require fixing before it can be used
+seriously.
+
+The species without strong bayes factors are still encouraging.  The
+p-value confirms they relate to Crohn's Disease in some way, in which
+case ``causes'' and ``is caused by'' are the most likely models by
+simple priors.  These small values bump our posterior belief some.
+This is not enough to recommend to patients, but it is a better place
+to start RCTs than anything we had before.
+
+\printbibliography
 
 \end{document}

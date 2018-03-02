@@ -195,7 +195,7 @@ def prettyco(co):
     if co.threshold==0:
         return co.sick_when_more and 'present' or 'absent'
     dir = (co.sick_when_more and '>' or '\\leq')
-    return '$%s$%.2E' % (dir, co.threshold)
+    return '$%s%.1e$' % (dir, co.threshold)
 
 def expect(val, ex, desc):
     if type(ex)==type(lambda:0):
