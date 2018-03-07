@@ -37,10 +37,22 @@ def create_net(b_depends_on, c_depends_on):
                   b_given_a=p_b,
                   c_given_ab=p_c)
 
+def randpair():
+    p1 = random()/4
+    p2 = random()/4
+    if random()>.5:
+        p1 = 1-p1
+    else:
+        p2 = 1-p2
+    return [p1,p2]
+
+
 def simulate(p, n):
     out=[[],[],[]]
     if hasattr(p,'d_given_a'):
         out.append([])
+        if hasattr(p,'e_given_b'):
+            out.append([])
     for i in range(n):
         a=(random()<p.a)
         b=(random()<p.b_given_a[a])
@@ -50,6 +62,8 @@ def simulate(p, n):
         out[2].append(c)
         if hasattr(p,'d_given_a'):
             out[3].append(random()<p.d_given_a[a])
+            if hasattr(p,'e_given_b'):
+                out[4].append(random()<p.e_given_b[b])
     return out
 
 def create_big_net(n, outlinks):

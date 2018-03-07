@@ -13,6 +13,7 @@
   \begin{tikzpicture}[overlay,remember picture,out=340,in=210,distance=0.3cm]
     \draw [->,shorten >=3pt,shorten <=-3pt] ({#1}.south) to ({#2}.west);
   \end{tikzpicture}
+  \hspace{-0.4cm}
 }  
 \newcommand{\Ex}{\mathbb{E}}
 \usepackage{graphicx}
@@ -319,7 +320,7 @@ is a brittle endevour, but there is a local solution.
 
 Suppose there exist three variable (bacteria) with a common (hidden) cause,
 such that one causes the variable of interest (disease), that is
-$H\tikzmark{h} \rightarrow B_1 \rightarrow D \; B_2\tikzmark{b3} \;
+$H \rightarrow \tikzmark{h} B_1 \rightarrow D \; B_2\tikzmark{b3} \;
 B_3\tikzmark{c3}$ \underarrow{h}{b3} \underarrow{h}{c3}.  The trio
 $B_{1,2,3}$ can be identified because they
 all correlate and remain correlated when controlling for any of them.
@@ -544,7 +545,6 @@ therapy that an ideal algorithm would have found, but we will not
 claim an ineffective therapy is effective (any more than normal
 uncertainty requires).
 
-
 \subsection{D-Separation}
 
 The d-separation test has mean log loss of 0.41 when comparing a
@@ -559,6 +559,34 @@ $\chi^2$ test to pick up.  As such, it is unclear what it would mean
 to test it in simulation.  Certainly with parameters chosen for the
 purpose, it will work.  With random parameters, it will generally fail
 to find trios.
+
+\subsection{Common Cause Testing}
+
+The test for three variables with a common cause is simple: test each
+pair for dependence using standard $\chi^2$ both with and without
+controlling for the third.  If all six tests find a p-value under the
+threshold, consider them common-caused.
+
+This test does not attempt to find all trios with common causes.  For
+random parameters, it will find very few.  To test it, we created
+exceptionally strong links, by drawing $p(B|A)$ from either [0,0.25]
+or [0.75,1] and $p(B|~A)$ from the other range.  With these links, and
+a p-threshold of 0.001, we found the following results:
+
+  \begin{tabular}{lrrr}
+    Number of datapoints & 58 & 100 & 500 \\
+    $H \tikzmark{h5} \rightarrow A \; B\tikzmark{b5} \; C\tikzmark{c5}$
+    \underarrow{h5}{b5} \underarrow{h5}{c5} &
+    16.6\% & 56\% & 99.4\% \\
+    $ A \rightarrow B \rightarrow C $ &
+    8.8\% & 9.6\% & 2.9\%
+  \end{tabular}
+
+This shows the Common Cause Test works, at least for strong links, but
+only with larger datasets than we actually have.
+
+
+
 
 \section{Crohn's Disease}
 
@@ -625,12 +653,54 @@ to start RCTs than anything we had before.
 
 \subsection{Adjusting for Multiple Hypotheses}
 
-Having considered 61 species of bacteria in order to find any that appear causal must cast some doubt on our results.  Worse, considering 1830 pairs of species for the Bacterium-Bacterium Collider or almost 36 thousand triples for the Applied D-Separation test case extreme doubt.
+\begin{figure}[b!]
+  \includegraphics[width=0.5\textwidth]{histogram}
+  \caption{Number of correlating species with each bayes factor
+    (higher means cause, lower means effect) as found by the gene
+    collision test.}
+  \label{hist}
+\end{figure}
 
-The classic response to this problem would be to divide our prior by the number of hypotheses, similarly to a Bonferroni correction.  This would represent our a-priori knowledge that exactly one of the species under consideration is causal.  In fact, we know nothing of the sort.  Different species of bacteria routinely emit similar chemical signals, and likely play similar biological roles.
+Having considered 61 species of bacteria in order to find any that
+appear causal must cast some doubt on our results.  Worse, considering
+1830 pairs of species for the Bacterium-Bacterium Collider or almost
+36 thousand triples for the Applied D-Separation test case extreme
+doubt.
 
-What do we know a-priori?  For any given correlating species, a 50\% prior credence of causality sounds reasonable, albeit debatable.  A 99.9\% confidence that between 20 and 50 of the species are causal most emphatically does not.  A different prior does not protect us from this class of absurdity.  The only reasonable conclusion is that our uncertainties regarding different species are not independent of one another.
+The classic response to this problem would be to divide our prior by
+the number of hypotheses, similarly to a Bonferroni correction.  This
+would represent our a-priori knowledge that exactly one of the species
+under consideration is causal.  In fact, we know nothing of the sort.
+Different species of bacteria routinely emit similar chemical signals,
+and likely play similar biological roles.
 
+What do we know a-priori?  For any given correlating species, a 50\%
+prior credence of causality sounds reasonable, albeit debatable.  A
+99.9\% confidence that between 20 and 50 of the species are causal
+most emphatically does not.  A different prior does not protect us
+from this class of absurdity.  The only reasonable conclusion is that
+our uncertainties regarding different species are not independent of
+one another.  Specifically, each time we learn the causal nature of a
+single correlating species, we should update our belief in the others
+in the same direction.  This makes sense biologically, since some of
+our uncertainty about different species stems from the same unknowns
+in human biology.
+
+Sadly, this does not give us a numeric answer, but it does encourage
+us to look at the histogram (figure \ref{hist}).  We see a clear peak on the
+``weak evidence for disease $\rightarrow$ bacteria'' side, and most of
+the species over the line look like the spread around the peak.
+L. acidophilus and S. pseudopneumoniae appear to be outliers, and
+therefore more likely to be real causal effects.
+
+The same technique cannot be applied to the Two Bacterium Collider
+test, because any common cause of the species (that is, 
+$H\tikzmark{h4} \rightarrow B_1,\tikzmark{b14} B_2\tikzmark{b24}
+\rightarrow D\tikzmark{d4}$ \underarrow{h4}{b24} \underarrow{b14}{d4})
+will produce a correlation between $B_1$ and $B_2$ despite their
+collider nature.   Since $H$ can be literally \textit{any}
+environmental factor that effects both species, its presence is less
+of a possibility and more of an inevitability.
 \printbibliography
 
 \end{document}
