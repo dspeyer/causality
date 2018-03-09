@@ -29,6 +29,8 @@ print 'Total bacterial species: %d' % len(data.bacteria)
 interesting = {}
 cos = {}
 bfs = []
+dropn2=0
+checkedbf=0
 for species in data.bacteria:
     vals = data.get_data(pl, 'fractions', species)
     co = findcutoff(vals, sick)
@@ -42,18 +44,23 @@ for species in data.bacteria:
     cnt = count(zip(boolvals, nod2))
     sumarr(cnt, 0.1)
     p = chi2_contingency(cnt)[1]
-    if p < .01:
+    if p < 0.1:
+        dropn2 += 1
         continue
     cnt = count(zip(boolvals, sick))
     sumarr(cnt, 0.1)
     p = chi2_contingency(cnt)[1]
     if p > .01:
         continue
+    checkedbf += 1
     bf = direction.montecarlo(nod2, sick, boolvals, len(nod2)).bayes_fwd_rev
     bfs.append(bf)
     if bf > 2 and '-print-gene-test' in argv:
         print '%s & %s & %.2g & %.2f' % (species, prettyco(co), p, bf)
 
+print
+print "calculated BFs for %d species" % checkedbf
+print "dropped %d for nod2 link" % dropn2
 print
 
 if '-histogram' in argv:
