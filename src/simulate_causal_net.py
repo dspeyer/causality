@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from utils import *
 from random import random, choice
 
 class RandUniq(object):

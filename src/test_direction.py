@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from datareader import Data
-from utils import *
+from utils import struct
 from scipy.stats import chi2_contingency
 from scipy.stats import chi2
 from scipy.stats import chisquare

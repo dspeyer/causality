@@ -10,7 +10,7 @@ from random import random
 from simulate_causal_net import simulate
 from collections import defaultdict
 from severs import montecarlo as severs
-from utils import struct, count, any#, severs
+from utils import struct, count, any
 
 tot=defaultdict(lambda:0)
 hit=defaultdict(lambda:0)
