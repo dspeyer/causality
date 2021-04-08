@@ -49,16 +49,6 @@ for i in range(10000):
     if any(cnt, lambda(x):x==0):
         continue
     try:
-#        print "--- %s ---" % net
-#        sev = severs(data[0], data[1], data[2])
-#        record(sev, False)
-        #        if sev>10:
-        #            print net
-#        print "Severs:"
-#        sev = severs(data[0], data[1], data[2])
-#        record(sev, False)
-#        sev = severs(data[1], data[2], data[0])
-#        record(sev, False)
        sev = severs(data[0], data[2], data[1])
        record(sev, True)
        sev = severs(data[1], data[2], data[0])

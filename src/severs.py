@@ -4,28 +4,6 @@ from utils import count, p_of_val, deepcopy, mularr, sumarr
 from math import log, exp
 from numpy.random import beta
 
-# Doesn't work
-# needs to use the information in cut somehow
-def conditional(a, b, cut):
-    apart = count(zip(cut, a, b))
-    together = count(zip(a,b))
-    just_b = count(zip(b))
-    p_b_given_a = [ float(row[1]) / sum(row) for row in together ]
-    p_b = float(just_b[1]) / sum(just_b)
-    print 'apart=%s p(b|a)=%s p(b)=%s' % (apart, p_b_given_a, p_b)
-    score_sev = 0
-    score_nsev = 0
-    for cv in [0,1]:
-        for av in [0,1]:
-            for bv in [0,1]:
-                if apart[cv][av][bv]==0:
-                    continue
-                score_sev += log(p_of_val(p_b, bv)) * apart[cv][av][bv]
-                score_nsev += log(p_of_val(p_b_given_a[av], bv)) * apart[cv][av][bv]
-                print 'cnt(a=%d,b=%d)=%d => %.3g / %.3g' % (av,bv,apart[cv][av][bv],score_sev,score_nsev)
-    print
-    return exp(score_sev - score_nsev)
-
 
 def logp_obs_given(cnt, p):
     out = 0

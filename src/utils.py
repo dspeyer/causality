@@ -63,12 +63,6 @@ def normmi(a,b):
     ej=entropy(map(lambda x:'%s/%s'%x,zip(a,b)))
     return (ea+eb-ej)/max(ea,eb)
 
-def normmicond(a,b,c):
-    eac=entropy(map(lambda x:'%s/%s'%x,zip(a,c)))
-    ebc=entropy(map(lambda x:'%s/%s'%x,zip(b,c)))
-    ec=entropy(c)
-    ej=entropy(map(lambda x:'%s/%s/%s'%x,zip(a,b,c)))
-    return (eac+ebc-ej-ec)/max(eac,ebc)
 
 def mi(a,b):
     ea=entropy(a)
@@ -83,16 +77,6 @@ def micond(a,b,c):
     ej=entropy(map(lambda x:'%s/%s/%s'%x,zip(a,b,c)))
     return eac+ebc-ej-ec
 
-def findp(v,l):
-    mi=0
-    ma=len(l)-1
-    while ma>mi+1:
-        t=int((mi+ma)/2)
-        if v>l[t]:
-            mi=t
-        else:
-            ma=t
-    return (len(l)-float(ma))/len(l) # subtracting before dividing avoids annoying rounding errors
 
 def deepin(l, v):
     if type(l)==type(v):
@@ -191,12 +175,6 @@ def findcutoff(bact, dis):
             bestscore = score
     return best
 
-def prettyco(co):
-    if co.threshold==0:
-        return co.sick_when_more and 'present' or 'absent'
-    dir = (co.sick_when_more and '>' or '\\leq')
-    return '$%s%.1e$' % (dir, co.threshold)
-
 def expect(val, ex, desc):
     if type(ex)==type(lambda:0):
         exf = ex
@@ -232,16 +210,6 @@ def link(a,b):
     cnt = count(zip(a, b))
     sumarr(cnt, 0.1)
     return chi2_contingency(cnt)[1]
-
-def link_despite(a,b,despite):
-    cnt = count(zip(despite, a, b))
-    ps=[0,0]
-    for i in [0,1]:
-        try:
-            ps[i]=chi2_contingency(cnt[i])[1]
-        except ValueError:
-            ps[i]=1
-    return min(ps)
 
 def blurred_chi2_pdf(score, n):
     blurred = n * (chi2.cdf(score+1.0/n, 1) - chi2.cdf(score, 1))
@@ -324,11 +292,3 @@ def any(l, cond):
                 return True
         return False
     return cond(l)
-
-def format2(x):
-    if x<0.1:
-        return '%.1g' % x
-    elif x<10:
-        return '%.1f' % x
-    else:
-        return '%d' % x
