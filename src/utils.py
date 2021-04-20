@@ -4,6 +4,7 @@ from copy import copy
 from copy import deepcopy
 from collections import defaultdict
 from math import log, exp
+import numpy as np
 from scipy.stats import chisquare
 from scipy.stats import chi2_contingency
 from scipy.stats import chi2
@@ -27,17 +28,14 @@ def count(data, limits=None):
 #    print data
     if limits==None:
         limits=[2]*len(data[0])
-    out=0
-    for limit in reversed(limits):
-        out=[out]
-        for i in range(limit-1):
-            out.append(deepcopy(out[0]))
+    out=np.zeros(limits)
 #    print 'out[0] is out[1]: %s' % (out[0] is out[1])
 #    print 'out[0][0] is out[1][0]: %s' % (out[0][0] is out[1][0])
 #    print out
     for row in data:
         tmp=out
         for i,col in enumerate(row):
+            col=int(col)
             if (i<len(row)-1):
                 tmp=tmp[col]
             else:
@@ -85,20 +83,6 @@ def deepin(l, v):
         if deepin(i, v):
             return True
     return False
-
-def mularr(arr, f):
-    for i in range(len(arr)):
-        if type(arr[i])==type([]):
-            mularr(arr[i],f)
-        else:
-            arr[i]*=f
-
-def sumarr(arr, f):
-    for i in range(len(arr)):
-        if type(arr[i])==type([]):
-            sumarr(arr[i],f)
-        else:
-            arr[i]+=f
 
 def acclarr(a, b):
     for i in range(len(a)):
@@ -284,11 +268,3 @@ def severs(a,b,cut,verbose=False):
                 print ' p=%s' % peg_nsev
             bayes_factor[model] *= peg_sev/peg_nsev 
     return min(bayes_factor)
-
-def any(l, cond):
-    if type(l)==type([]):
-        for i in l:
-            if any(i, cond):
-                return True
-        return False
-    return cond(l)

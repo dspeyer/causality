@@ -10,7 +10,7 @@ from random import random
 from simulate_causal_net import simulate
 from collections import defaultdict
 from severs import montecarlo as severs
-from utils import struct, count, any
+from utils import struct, count
 
 tot=defaultdict(lambda:0)
 hit=defaultdict(lambda:0)
@@ -46,7 +46,7 @@ for i in range(10000):
     net.c_given_ab = [c_given_b] * 2
     data = simulate(net, 100)
     cnt = count(zip(*data))
-    if any(cnt, lambda(x):x==0):
+    if (cnt==0).any():
         continue
     try:
        sev = severs(data[0], data[2], data[1])
